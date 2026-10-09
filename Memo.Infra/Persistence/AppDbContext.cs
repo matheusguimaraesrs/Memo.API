@@ -7,7 +7,11 @@ namespace Memo.Infra.Persistence;
 
 public sealed class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly IUserContext _userContext;
+    public AppDbContext(DbContextOptions<AppDbContext> options, IUserContext userContext) : base(options)
+    {
+        _userContext = userContext;
+    }
 
     public DbSet<Seller> Sellers => Set<Seller>();
 
@@ -29,5 +33,31 @@ public sealed class AppDbContext : DbContext
                 modelBuilder.Entity(entity.ClrType).HasQueryFilter(lambda);
             }
         }
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var userName = _userContext?.UserName;
+
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.WhoCreated(userName);
+                    break;
+                case EntityState.Modified:
+                    entry.Property(p => p.CreatedAt).IsModified = false;
+                    entry.Property(p => p.CreatedBy).IsModified = false;
+                    entry.Entity.Update(userName);
+                    break;
+                case EntityState.Deleted:
+                    entry.State = EntityState.Modified;
+                    entry.Entity.SoftDelete(userName);
+                    break;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,42 +1,40 @@
 using Memo.Domain.Entities;
-using Memo.Domain.Interfaces;
+using Memo.Domain.IRepositories;
 using Memo.Infra.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Repositories;
 
-internal sealed class SellerRepository : ISellerRepository
+internal sealed class SellerRepository(AppDbContext context) : ISellerRepository
 {
-    private readonly AppDbContext _context;
-
-    public SellerRepository(AppDbContext context)
+    public async Task<Seller?> GetByIdAsync(Guid id)
     {
-        _context = context;
-    }
-    
-    public Task<Seller?> GetByIdAsync(Guid id)
-    {
-        throw new NotImplementedException();
+        return await context.Set<Seller>().FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<List<Seller>> GetAllAsync()
+    public async Task<IEnumerable<Seller>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await context.Set<Seller>().ToListAsync();
     }
 
     public async Task<Seller> AddAsync(Seller seller)
     {
-        await _context.Sellers.AddAsync(seller);
-        await _context.SaveChangesAsync();
+        await context.Sellers.AddAsync(seller);
+        await context.SaveChangesAsync();
         return seller;
     }
 
-    public Task<Seller> UpdateAsync(Seller seller)
+    public async Task<Seller> UpdateAsync(Seller seller)
     {
-        throw new NotImplementedException();
+        context.Sellers.Update(seller);
+        await context.SaveChangesAsync();
+        return seller;
     }
 
-    public Task<Seller> DeleteAsync(Guid id)
+    public async Task<Seller> DeleteAsync(Seller seller)
     {
-        throw new NotImplementedException();
+        context.Set<Seller>().Remove(seller);
+        await context.SaveChangesAsync();
+        return seller;
     }
 }
