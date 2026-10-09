@@ -1,0 +1,43 @@
+# Build outputs
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+**/TestResults/
+
+# .NET / Visual Studio
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.cache
+*.pidb
+*.svclog
+*.vsp
+*.vspscc
+.vs/
+
+# JetBrains Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
