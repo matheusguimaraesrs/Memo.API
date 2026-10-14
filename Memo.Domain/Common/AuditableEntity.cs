@@ -1,6 +1,6 @@
 namespace Memo.Domain.Common;
 
-public abstract class AuditableEntity
+public abstract class AuditableEntity : IAuditable
 {
     public Guid Id { get; protected set; } = Guid.NewGuid();
     public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
@@ -11,25 +11,18 @@ public abstract class AuditableEntity
     public DateTime? DeletedAt { get; protected set; }
     public string? DeletedBy { get; protected set; }
 
-    public void WhoCreated(string? userName) => CreatedBy = userName;
+    void IAuditable.WhoCreated(string? userName) => CreatedBy = userName;
 
-    public void Update(string? userName)
+    void IAuditable.UpdateAudit(string? userName)
     {
         UpdatedAt = DateTime.UtcNow;
         UpdatedBy = userName;
     } 
 
-    public void SoftDelete(string? userName)
+    void IAuditable.SoftDelete(string? userName)
     {
         IsDeleted = true;
         DeletedAt = DateTime.UtcNow;
         DeletedBy = userName;
-    }
-
-    protected void Restore()
-    {
-        IsDeleted = false;
-        DeletedAt = null;
-        DeletedBy = null;
     }
 }

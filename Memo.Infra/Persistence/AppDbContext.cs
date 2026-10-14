@@ -39,7 +39,7 @@ public sealed class AppDbContext : DbContext
     {
         var userName = _userContext?.UserName;
 
-        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        foreach (var entry in ChangeTracker.Entries<IAuditable>())
         {
             switch (entry.State)
             {
@@ -47,9 +47,9 @@ public sealed class AppDbContext : DbContext
                     entry.Entity.WhoCreated(userName);
                     break;
                 case EntityState.Modified:
-                    entry.Property(p => p.CreatedAt).IsModified = false;
-                    entry.Property(p => p.CreatedBy).IsModified = false;
-                    entry.Entity.Update(userName);
+                    entry.Property(nameof(AuditableEntity.CreatedAt)).IsModified = false;
+                    entry.Property(nameof(AuditableEntity.CreatedBy)).IsModified = false;
+                    entry.Entity.UpdateAudit(userName);
                     break;
                 case EntityState.Deleted:
                     entry.State = EntityState.Modified;

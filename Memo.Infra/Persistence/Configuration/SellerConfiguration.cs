@@ -8,10 +8,11 @@ internal sealed class SellerConfiguration : IEntityTypeConfiguration<Seller>
 {
     public void Configure(EntityTypeBuilder<Seller> builder)
     {
+        builder.ToTable("Sellers");
         builder.HasKey(seller => seller.Id);
         builder.Property(seller => seller.Name).IsRequired().HasMaxLength(100);
         builder.Property(seller => seller.Login).IsRequired().HasMaxLength(15);
-        builder.Property(seller => seller.PasswordHash).IsRequired();
-        builder.Property(seller => seller.PasswordSalt).IsRequired();
+        builder.HasIndex(seller => seller.Login).IsUnique();
+        builder.Property(seller => seller.Password).IsRequired().HasMaxLength(20);
     }
 }

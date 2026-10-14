@@ -53,13 +53,10 @@ namespace Memo.Infra.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<byte[]>("PasswordHash")
+                    b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("bytea");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -69,7 +66,10 @@ namespace Memo.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sellers");
+                    b.HasIndex("Login")
+                        .IsUnique();
+
+                    b.ToTable("Sellers", (string)null);
                 });
 #pragma warning restore 612, 618
         }
