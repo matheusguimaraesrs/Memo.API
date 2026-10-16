@@ -4,24 +4,25 @@ using Memo.Domain.Entities;
 using Memo.Domain.Exceptions;
 using Xunit;
 
-namespace Memo.Domain.Tests;
+namespace Memo.Domain.Tests.Entities;
 
 public class SellerTests
 {
+    private static Seller CreateSeller(string login = "test.login")
+    {
+        return new Seller("Test seller", login, "test-password");
+    }
+    
     [Fact]
     public void Create_WithValidParameters()
     {
-        string name = "João Silva";
-        string login = "joao.silva";
-        string password = "StrongPassword";
-        
-        Seller seller = new Seller(name, login, password);
+        Seller seller = CreateSeller();
 
         seller.Should().NotBeNull();
         seller.Id.Should().NotBeEmpty();
-        seller.Name.Should().Be(name); 
-        seller.Login.Should().Be(login);
-        seller.Password.Should().Be(password);
+        seller.Name.Should().Be("Test seller"); 
+        seller.Login.Should().Be("test.login");
+        seller.Password.Should().Be("test-password");
         
         //Audit tests
         seller.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
@@ -44,18 +45,17 @@ public class SellerTests
     [Fact]
     public void Update_WithValidParameters()
     {
-        string name = "João Silva";
-        string login = "joao.silva";
-        string password = "StrongPassword";
-        
-        Seller seller = new Seller(name, login, password);
+        Seller seller = CreateSeller();
 
-        name = "New Name";
-        login = "new.login";
+        string name = "New Name";
+        string login = "new.login";
+        string password = "new.password";
+        
         seller.Update(name, login, password);
 
         seller.Name.Should().Be(name);
         seller.Login.Should().Be(login);
+        seller.Password.Should().Be(password);
     }
 
     [Theory]
@@ -64,11 +64,11 @@ public class SellerTests
     [InlineData(null)]
     public void Update_WithInvalidParameters(string? invalidName)
     {
-        string name = "João Silva";
+        Seller seller = CreateSeller();
+        
         string login = "joao.silva";
         string password = "StrongPassword";
-        
-        Seller seller = new Seller(name, login, password);
+
         Action action = () => seller.Update(invalidName!, login, password);
         action.Should().Throw<DomainException>();
     }
@@ -76,11 +76,7 @@ public class SellerTests
     [Fact]
     public void SoftDelete_WithValidParameters()
     {
-        string name = "João Silva";
-        string login = "joao.silva";
-        string password = "StrongPassword";
-
-        Seller seller = new Seller(name, login, password);
+        Seller seller = CreateSeller();
         
         string admin = "admin";
         var auditable = (IAuditable)seller;
