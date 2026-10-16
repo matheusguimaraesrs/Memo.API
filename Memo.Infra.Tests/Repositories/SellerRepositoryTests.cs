@@ -4,7 +4,7 @@ using Memo.Infra.Repositories;
 using Memo.Infra.Tests.DbContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace Memo.Infra.Tests;
+namespace Memo.Infra.Tests.Repositories;
 
 public class SellerRepositoryTests
 {
