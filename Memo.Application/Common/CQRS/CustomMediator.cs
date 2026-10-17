@@ -8,8 +8,10 @@ public sealed class CustomMediator(IServiceProvider serviceProvider) : IMediator
 
         var requestType = request.GetType();
         var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResponse));
+        
         var handler = serviceProvider.GetService(handlerType) ??
                       throw new InvalidOperationException($"No handler registered for '{requestType.Name}'.");
+        
         var method = handlerType.GetMethod(nameof(IRequestHandler<IRequest<TResponse>, TResponse>.HandleAsync));
         return (Task<TResponse>)method!.Invoke(handler, [request, ct])!;
     }

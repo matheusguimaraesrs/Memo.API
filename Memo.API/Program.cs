@@ -1,12 +1,25 @@
+using Memo.Application.Common.CQRS;
 using Memo.Infra;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+//INFRA
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+//CQRS
+builder.Services.AddTransient<IMediator, CustomMediator>();
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<Program>()
+    .AddClasses(classes => classes.AssignableTo(typeof(IRequestHandler<,>)))
+    .AsImplementedInterfaces()
+    .WithTransientLifetime());
+
 
 var app = builder.Build();
 
