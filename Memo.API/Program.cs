@@ -8,11 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-//INFRA
+// DI - INFRA
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-//CQRS
+// CQRS
 builder.Services.AddTransient<IMediator, CustomMediator>();
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
