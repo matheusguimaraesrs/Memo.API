@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Tests.DbContext;
 
-public class AppDbContextTests
+public sealed class AppDbContextTests
 {
     [Fact]
     public async Task Should_Set_CreatedBy_When_Added()

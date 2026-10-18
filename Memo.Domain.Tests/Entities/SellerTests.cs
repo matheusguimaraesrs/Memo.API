@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Memo.Domain.Tests.Entities;
 
-public class SellerTests
+public sealed class SellerTests
 {
     private static Seller CreateSeller(string login = "test.login")
     {

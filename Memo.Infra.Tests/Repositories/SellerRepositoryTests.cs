@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Tests.Repositories;
 
-public class SellerRepositoryTests
+public sealed class SellerRepositoryTests
 {
     private static Seller CreateSeller(string login = "test.login")
     {

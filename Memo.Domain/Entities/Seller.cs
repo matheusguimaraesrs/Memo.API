@@ -3,7 +3,7 @@ using Memo.Domain.Exceptions;
 
 namespace Memo.Domain.Entities;
 
-public class Seller : AuditableEntity
+public sealed class Seller : AuditableEntity
 {
     public string Name { get; private set; }
     public string Login { get; private set; }

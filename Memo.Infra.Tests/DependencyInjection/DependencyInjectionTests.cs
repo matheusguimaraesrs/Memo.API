@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Memo.Infra.Tests.DependencyInjection;
 
-public class DependencyInjectionTests
+public sealed class DependencyInjectionTests
 {
     [Fact]
     public void Should_Register_Infrastructure_Dependencies()
