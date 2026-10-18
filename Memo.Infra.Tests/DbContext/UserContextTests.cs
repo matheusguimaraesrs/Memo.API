@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Memo.Infra.Tests.DbContext;
 
-public class UserContextTests
+public sealed class UserContextTests
 {
     [Fact]
     public void Should_Return_UserId_And_UserName()
