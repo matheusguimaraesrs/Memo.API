@@ -1,19 +1,14 @@
+using Memo.Application;
 using Memo.Application.Common.CQRS;
 using Memo.Infra;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // DI - INFRASTRUCTURE
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// CQRS
-builder.Services.AddTransient<IMediator, CustomMediator>();
-builder.Services.Scan(scan => scan
-    .FromAssemblyOf<IRequest<object>>()
-    .AddClasses(classes => classes.AssignableTo(typeof(IRequestHandler<,>)))
-    .AsImplementedInterfaces()
-    .WithTransientLifetime());
+// DI - APPLICATION
+builder.Services.AddApplication();
 
 // CONTROLLERS & SWAGGER
 builder.Services.AddControllers();
