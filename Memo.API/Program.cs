@@ -1,8 +1,13 @@
+using Memo.API.Exceptions;
 using Memo.Application;
 using Memo.Application.Common.CQRS;
 using Memo.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// EXCEPTION HANDLER
+builder.Services.AddExceptionHandler<ExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // DI - INFRASTRUCTURE
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -27,7 +32,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseExceptionHandler();
 app.MapControllers();
 
 app.Run();
