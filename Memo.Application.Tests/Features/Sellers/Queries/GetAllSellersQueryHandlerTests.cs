@@ -19,7 +19,7 @@ public sealed class GetAllSellersQueryHandlerTests
     [Fact]
     public async Task HandleAsync_WhenSellersExist()
     {
-        List<Seller> sellers = new List<Seller>()
+        List<Seller> sellers = new List<Seller>
         {
             new Seller("Seller One", "seller.1", "123"),
             new Seller("Seller Two", "seller.2", "123")
