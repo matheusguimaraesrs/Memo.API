@@ -15,6 +15,7 @@
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Scrutor" Version="7.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,6 +28,10 @@
       <ProjectReference Include="..\Memo.Application\Memo.Application.csproj" />
       <ProjectReference Include="..\Memo.Domain\Memo.Domain.csproj" />
       <ProjectReference Include="..\Memo.Infra\Memo.Infra.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
     </ItemGroup>
 
 </Project>
