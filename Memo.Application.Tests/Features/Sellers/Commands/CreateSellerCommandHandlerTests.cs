@@ -24,7 +24,7 @@ public sealed class CreateSellerCommandHandlerTests
     {
         Seller? seller = null;
         _repository.AddAsync(Arg.Do<Seller>(s => seller = s))
-            .Returns(callInfo => callInfo.Arg<Seller>());
+            .Returns(info => info.Arg<Seller>());
         
         var command = new CreateSellerCommand("John Test", "john.test", "StrongPassword");
         var result = await _handler.HandleAsync(command, CancellationToken.None);
