@@ -23,8 +23,7 @@ public sealed class DeleteSellerCommandHandlerTests
     public async Task HandleAsync_WhenSellerExists()
     {
         Seller seller = new Seller("Test Name", "test.login", "StrongPassword");
-        _repository.GetByIdAsync(seller.Id)
-            .Returns(Task.FromResult<Seller?>(seller));
+        _repository.GetByIdAsync(seller.Id).Returns(seller);
 
         var command = new DeleteSellerCommand(seller.Id);
 
