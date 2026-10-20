@@ -34,9 +34,9 @@ public sealed class SellersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update([FromBody] UpdateSellerCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSellerCommand command)
     {
-        await mediator.SendAsync(command);
+        await mediator.SendAsync(command with { Id = id });
         return NoContent();
     }
     
