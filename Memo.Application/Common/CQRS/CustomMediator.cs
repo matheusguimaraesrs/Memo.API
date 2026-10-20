@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -5,32 +6,49 @@ namespace Memo.Application.Common.CQRS;
 
 public sealed class CustomMediator(IServiceProvider serviceProvider) : IMediator
 {
-    public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct = default)
+    private static readonly ConcurrentDictionary<(Type Request, Type Response), RequestExecutor> Executors = new();
+
+    public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var requestType = request.GetType();
-        
-        var validatorType = typeof(IValidator<>).MakeGenericType(requestType);
-        var validator = serviceProvider.GetService(validatorType) as IValidator;
+        var executor = Executors.GetOrAdd(
+            (request.GetType(), typeof(TResponse)),
+            static key => (RequestExecutor)Activator.CreateInstance(
+                typeof(RequestExecutor<,>).MakeGenericType(key.Request, key.Response))!);
 
-        if (validator != null)
+        return ((RequestExecutor<TResponse>)executor).ExecuteAsync(serviceProvider, request, ct);
+    }
+
+    private abstract class RequestExecutor;
+
+    private abstract class RequestExecutor<TResponse> : RequestExecutor
+    {
+        public abstract Task<TResponse> ExecuteAsync(
+            IServiceProvider serviceProvider, IRequest<TResponse> request, CancellationToken ct);
+    }
+
+    private sealed class RequestExecutor<TRequest, TResponse> : RequestExecutor<TResponse>
+        where TRequest : IRequest<TResponse>
+    {
+        public override async Task<TResponse> ExecuteAsync(
+            IServiceProvider serviceProvider, IRequest<TResponse> request, CancellationToken ct)
         {
-            var contextType = typeof(ValidationContext<>).MakeGenericType(requestType);
-            var context = (IValidationContext)Activator.CreateInstance(contextType, request)!;
-            var validationResult = await validator.ValidateAsync(context, ct);
+            var typedRequest = (TRequest)request;
 
-            if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
+            var validator = serviceProvider.GetService<IValidator<TRequest>>();
+            if (validator != null)
+            {
+                var validationResult = await validator.ValidateAsync(typedRequest, ct);
+                if (!validationResult.IsValid)
+                    throw new ValidationException(validationResult.Errors);
+            }
+
+            var handler = serviceProvider.GetService<IRequestHandler<TRequest, TResponse>>()
+                ?? throw new InvalidOperationException(
+                    $"No handler registered for {typeof(TRequest).Name}.");
+
+            return await handler.HandleAsync(typedRequest, ct);
         }
-        
-        var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResponse));
-        var handler = serviceProvider.GetRequiredService(handlerType);
-
-        var method = handlerType.GetMethod("HandleAsync");
-        if (method == null)
-            throw new InvalidOperationException($"HandleAsync method not found on {handlerType.Name}");
-
-        return await (Task<TResponse>)method.Invoke(handler, new object[] { request, ct })!;
     }
 }

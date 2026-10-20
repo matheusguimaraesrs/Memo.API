@@ -36,6 +36,20 @@ public class CustomMediatorTests
     }
     
     [Fact]
+    public async Task SendAsync_When_Handler_Throws_Propagates_Original_Exception()
+    {
+        var request = new TestRequest("Test");
+        var handler = Substitute.For<IRequestHandler<TestRequest, string>>();
+        handler.HandleAsync(request, Arg.Any<CancellationToken>())
+            .Returns<Task<string>>(_ => throw new Memo.Domain.Exceptions.DomainException("boom"));
+
+        _serviceProvider.GetService(typeof(IRequestHandler<TestRequest, string>)).Returns(handler);
+
+        await Assert.ThrowsAsync<Memo.Domain.Exceptions.DomainException>(() =>
+            _mediator.SendAsync(request, CancellationToken.None));
+    }
+
+    [Fact]
     public async Task SendAsync_When_Handler_Not_Registered()
     {
         // Arrange
