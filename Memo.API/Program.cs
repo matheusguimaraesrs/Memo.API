@@ -6,7 +6,7 @@ using Memo.Infra;
 var builder = WebApplication.CreateBuilder(args);
 
 // EXCEPTION HANDLER
-builder.Services.AddExceptionHandler<ExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // DI - INFRASTRUCTURE
