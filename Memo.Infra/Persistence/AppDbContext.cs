@@ -37,7 +37,7 @@ public sealed class AppDbContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var userName = _userContext?.UserName;
+        var userName = _userContext.UserName;
 
         foreach (var entry in ChangeTracker.Entries<IAuditable>())
         {
@@ -53,6 +53,8 @@ public sealed class AppDbContext : DbContext
                     break;
                 case EntityState.Deleted:
                     entry.State = EntityState.Modified;
+                    entry.Property(nameof(AuditableEntity.CreatedAt)).IsModified = false;
+                    entry.Property(nameof(AuditableEntity.CreatedBy)).IsModified = false;
                     entry.Entity.SoftDelete(userName);
                     break;
             }
