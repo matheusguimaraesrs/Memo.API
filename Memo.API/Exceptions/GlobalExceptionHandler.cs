@@ -7,7 +7,7 @@ using Npgsql;
 
 namespace Memo.API.Exceptions;
 
-internal sealed class ExceptionHandler(ILogger<ExceptionHandler> logger) : IExceptionHandler
+internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
