@@ -25,7 +25,7 @@ public sealed class UserContextTests
         };
         var userContext = new UserContext(accessor);
 
-        userContext.UserId.Should().Be("userId-123");
-        userContext.UserName.Should().Be("User Name");
+        userContext.Id.Should().Be("userId-123");
+        userContext.Name.Should().Be("User Name");
     }
 }

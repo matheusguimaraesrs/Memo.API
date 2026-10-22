@@ -6,6 +6,6 @@ namespace Memo.Infra.Services;
 
 public class UserContext(IHttpContextAccessor accessor) : IUserContext
 {
-    public string? UserId => accessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    public string? UserName => accessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+    public string? Id => accessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    public string? Name => accessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
 }

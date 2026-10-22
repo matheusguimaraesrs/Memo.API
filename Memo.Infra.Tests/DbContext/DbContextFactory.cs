@@ -17,7 +17,7 @@ internal static class DbContextFactory
     
     private sealed class FakeUserContext : IUserContext
     {
-        public string? UserId => null;
-        public string? UserName => "test-user";
+        public string? Id => null;
+        public string? Name => "test-user";
     }
 }
