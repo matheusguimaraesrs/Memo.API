@@ -37,7 +37,7 @@ public sealed class AppDbContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var userName = _userContext.UserName;
+        var userName = _userContext.Name;
 
         foreach (var entry in ChangeTracker.Entries<IAuditable>())
         {
