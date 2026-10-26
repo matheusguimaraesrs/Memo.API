@@ -3,7 +3,7 @@ using Memo.Domain.Entities;
 
 namespace Memo.Domain.IRepositories;
 
-public interface IRepresentedCompany
+public interface IRepresentedCompanyRepository
 {
     Task<PagedList<RepresentedCompany>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default);
     Task<RepresentedCompany?> GetByIdAsync(Guid id);
