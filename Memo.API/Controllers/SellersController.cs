@@ -13,11 +13,10 @@ namespace Memo.API.Controllers;
 public sealed class SellersController(IMediator mediator) : ControllerBase 
 {
     [HttpGet]
-    [EndpointSummary("Listar vendedores")]
-    [EndpointDescription("Retorna a lista de vendedores ativos.")]
-    public async Task<IActionResult> GetAll()
+    [EndpointSummary("Listar vendedores paginado")]
+    [EndpointDescription("Retorna a lista paginada de vendedores ativos.")]
     {
-        var result = await mediator.SendAsync(new GetAllSellersQuery());
+        var result = await mediator.SendAsync(new GetAllSellersQuery(page, pageSize));
         return Ok(result);
     }
 
