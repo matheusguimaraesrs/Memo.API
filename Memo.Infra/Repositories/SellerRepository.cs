@@ -2,11 +2,12 @@ using Memo.Domain.Common;
 using Memo.Domain.Entities;
 using Memo.Domain.IRepositories;
 using Memo.Infra.Persistence;
+using Memo.Infra.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Repositories;
 
-internal sealed class SellerRepository(AppDbContext context) : ISellerRepository
+internal sealed class SellerRepository(AppDbContext context, IPaginationService pagination) : ISellerRepository
 {
     public async Task<PagedList<Seller>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default)
     {
@@ -14,14 +15,8 @@ internal sealed class SellerRepository(AppDbContext context) : ISellerRepository
             .AsNoTracking()
             .OrderBy(seller => seller.CreatedAt)
             .ThenBy(seller => seller.Id);
-        
-        int totalItems = await query.CountAsync(ct);
-        List<Seller> sellers = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(ct);
 
-        return new PagedList<Seller>(sellers, page, pageSize, totalItems);
+        return await pagination.PaginateAsync(query, page, pageSize, ct);
     }
 
     public async Task<Seller?> GetByIdAsync(Guid id)

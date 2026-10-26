@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPaginationService, PaginationService>();
 
         services.AddScoped<ISellerRepository, SellerRepository>();
         
