@@ -27,21 +27,18 @@ internal sealed class SellerRepository(AppDbContext context, IPaginationService 
     public async Task<Seller> AddAsync(Seller seller)
     {
         await context.Sellers.AddAsync(seller);
-        await context.SaveChangesAsync();
         return seller;
     }
 
     public async Task<Seller> UpdateAsync(Seller seller)
     {
         context.Sellers.Update(seller);
-        await context.SaveChangesAsync();
         return seller;
     }
 
     public async Task<Seller> DeleteAsync(Seller seller)
     {
         context.Set<Seller>().Remove(seller);
-        await context.SaveChangesAsync();
         return seller;
     }
 }

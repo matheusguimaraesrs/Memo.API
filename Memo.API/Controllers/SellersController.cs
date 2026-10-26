@@ -13,13 +13,16 @@ namespace Memo.API.Controllers;
 public sealed class SellersController(IMediator mediator) : ControllerBase 
 {
     [HttpGet]
-    public async Task<IActionResult> GetAllPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    [EndpointSummary("Listar vendedores paginado")]
+    [EndpointDescription("Retorna a lista paginada de vendedores ativos.")]
     {
         var result = await mediator.SendAsync(new GetAllSellersQuery(page, pageSize));
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
+    [EndpointSummary("Buscar vendedor por ID")]
+    [EndpointDescription("Retorna os dados de um vendedor específico.")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await mediator.SendAsync(new GetSellerByIdQuery(id));
@@ -27,6 +30,8 @@ public sealed class SellersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
+    [EndpointSummary("Criar vendedor")]
+    [EndpointDescription("Cria um vendedor novo e retorna o seu ID.")]
     public async Task<IActionResult> Create([FromBody] CreateSellerCommand command)
     {
         Guid id = await mediator.SendAsync(command);
@@ -34,6 +39,8 @@ public sealed class SellersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [EndpointSummary("Alterar vendedor")]
+    [EndpointDescription("Edita os dados de um vendedor específico.")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSellerCommand command)
     {
         await mediator.SendAsync(command with { Id = id });
@@ -41,6 +48,8 @@ public sealed class SellersController(IMediator mediator) : ControllerBase
     }
     
     [HttpDelete("{id:guid}")]
+    [EndpointSummary("Deletar vendedor")]
+    [EndpointDescription("Exclui logicamente (soft-delete) um vendedor específico.")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         await mediator.SendAsync(new DeleteSellerCommand(id), ct);

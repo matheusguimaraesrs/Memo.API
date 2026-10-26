@@ -37,25 +37,23 @@ public sealed class AppDbContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var userName = _userContext.UserName;
-
         foreach (var entry in ChangeTracker.Entries<IAuditable>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.WhoCreated(userName);
+                    entry.Entity.WhoCreated(_userContext.Name);
                     break;
                 case EntityState.Modified:
                     entry.Property(nameof(AuditableEntity.CreatedAt)).IsModified = false;
                     entry.Property(nameof(AuditableEntity.CreatedBy)).IsModified = false;
-                    entry.Entity.UpdateAudit(userName);
+                    entry.Entity.UpdateAudit(_userContext.Name);
                     break;
                 case EntityState.Deleted:
                     entry.State = EntityState.Modified;
                     entry.Property(nameof(AuditableEntity.CreatedAt)).IsModified = false;
                     entry.Property(nameof(AuditableEntity.CreatedBy)).IsModified = false;
-                    entry.Entity.SoftDelete(userName);
+                    entry.Entity.SoftDelete(_userContext.Name);
                     break;
             }
         }
