@@ -13,9 +13,9 @@ namespace Memo.API.Controllers;
 public sealed class SellersController(IMediator mediator) : ControllerBase 
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await mediator.SendAsync(new GetAllSellersQuery());
+        var result = await mediator.SendAsync(new GetAllSellersQuery(page, pageSize));
         return Ok(result);
     }
 

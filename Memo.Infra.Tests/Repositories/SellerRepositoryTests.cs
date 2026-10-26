@@ -53,16 +53,21 @@ public sealed class SellerRepositoryTests
     }
 
     [Fact]
-    public async Task Should_Return_All_Sellers()
+    public async Task Should_Return_Paged_Sellers()
     {
         await using var context = DbContextFactory.Create();
         var repository = new SellerRepository(context);
         await repository.AddAsync(CreateSeller("first.login"));
         await repository.AddAsync(CreateSeller("second.login"));
+        await repository.AddAsync(CreateSeller("third.login"));
 
-        var result = (await repository.GetAllAsync()).ToList();
+        var result = await repository.GetPagedAsync(2, 2);
 
-        result.Should().HaveCount(2);
+        result.Items.Should().HaveCount(1);
+        result.Page.Should().Be(2);
+        result.PageSize.Should().Be(2);
+        result.TotalItems.Should().Be(3);
+        result.TotalPages.Should().Be(2);
     }
 
     [Fact]
