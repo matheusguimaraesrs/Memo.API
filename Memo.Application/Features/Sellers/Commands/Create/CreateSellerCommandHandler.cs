@@ -15,7 +15,7 @@ internal sealed class CreateSellerCommandHandler(
     {
         Seller seller = new Seller(request.Name, request.Login, request.Password);
         
-        await repository.AddAsync(seller);
+        repository.Add(seller);
         await unitOfWork.SaveChangesAsync(ct);
 
         return seller.Id;
