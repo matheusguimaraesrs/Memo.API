@@ -30,7 +30,7 @@ public sealed class RepresentedCompany : AuditableEntity
     {
         if (string.IsNullOrWhiteSpace(companyName))
             throw new DomainException("Company name cannot be null or empty.");
-        if (commission == 0)
-            throw new DomainException("Commission cannot be zero.");
+        if (commission < 0 || commission > 100)
+            throw new DomainException("Commission must be between 0% and 100%.");
     }
 }

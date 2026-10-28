@@ -18,7 +18,7 @@ internal sealed class DeleteSellerCommandHandler(
         if (seller is null)
             throw new EntityNotFoundException<Seller>();
 
-        await repository.DeleteAsync(seller);
+        repository.Delete(seller);
         await unitOfWork.SaveChangesAsync(ct);
         
         return seller.Id;

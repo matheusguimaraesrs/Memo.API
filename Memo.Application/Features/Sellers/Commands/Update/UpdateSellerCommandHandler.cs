@@ -19,7 +19,7 @@ internal sealed class UpdateSellerCommandHandler(
             throw new EntityNotFoundException<Seller>();
         
         seller.Update(request.Name, request.Login, request.Password);
-        await repository.UpdateAsync(seller);
+        repository.Update(seller);
         await unitOfWork.SaveChangesAsync(ct);
 
         return seller.Id;

@@ -7,7 +7,7 @@ public interface ISellerRepository
 {
     Task<PagedList<Seller>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default);
     Task<Seller?> GetByIdAsync(Guid id);
-    Task<Seller> AddAsync(Seller seller);
-    Task<Seller> UpdateAsync(Seller seller);
-    Task<Seller> DeleteAsync(Seller seller);
+    Seller Add(Seller seller);
+    Seller Update(Seller seller);
+    Seller Delete(Seller seller);
 }
