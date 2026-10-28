@@ -27,7 +27,7 @@ public sealed class SellerRepositoryTests
         var repository = CreateRepository(context);
         var seller = CreateSeller();
 
-        var result = await repository.AddAsync(seller);
+        var result = repository.Add(seller);
 
         result.Should().BeSameAs(seller);
         var savedSeller = await context.Sellers.FindAsync(seller.Id);
@@ -40,7 +40,7 @@ public sealed class SellerRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
         var seller = CreateSeller();
-        await repository.AddAsync(seller);
+        repository.Add(seller);
 
         var result = await repository.GetByIdAsync(seller.Id);
 
@@ -64,9 +64,9 @@ public sealed class SellerRepositoryTests
     {
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
-        await repository.AddAsync(CreateSeller("first.login"));
-        await repository.AddAsync(CreateSeller("second.login"));
-        await repository.AddAsync(CreateSeller("third.login"));
+        repository.Add(CreateSeller("first.login"));
+        repository.Add(CreateSeller("second.login"));
+        repository.Add(CreateSeller("third.login"));
 
         var result = await repository.GetPagedAsync(2, 2);
 
@@ -83,10 +83,10 @@ public sealed class SellerRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
         var seller = CreateSeller();
-        await repository.AddAsync(seller);
+        repository.Add(seller);
 
         seller.Update("Updated seller", "updated.login", "updated-password");
-        await repository.UpdateAsync(seller);
+        repository.Update(seller);
 
         var updatedSeller = await repository.GetByIdAsync(seller.Id);
         updatedSeller!.Name.Should().Be("Updated seller");
@@ -99,9 +99,9 @@ public sealed class SellerRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
         var seller = CreateSeller();
-        await repository.AddAsync(seller);
+        repository.Add(seller);
 
-        await repository.DeleteAsync(seller);
+        repository.Delete(seller);
 
         (await repository.GetByIdAsync(seller.Id)).Should().BeNull();
         var deletedSeller = await context.Sellers
@@ -109,5 +109,4 @@ public sealed class SellerRepositoryTests
             .SingleAsync(item => item.Id == seller.Id);
         deletedSeller.IsDeleted.Should().BeTrue();
     }
-
 }

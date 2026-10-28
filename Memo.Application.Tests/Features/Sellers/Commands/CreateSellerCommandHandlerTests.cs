@@ -23,7 +23,7 @@ public sealed class CreateSellerCommandHandlerTests
     public async Task HandleAsync_ValidCommand()
     {
         Seller? seller = null;
-        _repository.AddAsync(Arg.Do<Seller>(s => seller = s))
+        _repository.Add(Arg.Do<Seller>(s => seller = s))
             .Returns(info => info.Arg<Seller>());
         
         var command = new CreateSellerCommand("John Test", "john.test", "StrongPassword");
@@ -35,7 +35,7 @@ public sealed class CreateSellerCommandHandlerTests
         seller.Login.Should().Be("john.test");
         seller.Password.Should().Be("StrongPassword");
         result.Should().Be(seller.Id);
-        await _repository.Received(1).AddAsync(Arg.Any<Seller>());
+        _repository.Received(1).Add(Arg.Any<Seller>());
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
     
@@ -48,7 +48,7 @@ public sealed class CreateSellerCommandHandlerTests
 
         await act.Should().ThrowAsync<DomainException>();
 
-        await _repository.DidNotReceive().AddAsync(Arg.Any<Seller>());
+        _repository.DidNotReceive().Add(Arg.Any<Seller>());
         await _unitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }
