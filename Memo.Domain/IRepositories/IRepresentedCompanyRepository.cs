@@ -7,7 +7,7 @@ public interface IRepresentedCompanyRepository
 {
     Task<PagedList<RepresentedCompany>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default);
     Task<RepresentedCompany?> GetByIdAsync(Guid id);
-    Task<Seller> AddAsync(RepresentedCompany representedCompany);
-    Task<Seller> UpdateAsync(RepresentedCompany representedCompany);
-    Task<Seller> DeleteAsync(RepresentedCompany representedCompany);
+    Task<RepresentedCompany> AddAsync(RepresentedCompany representedCompany);
+    Task<RepresentedCompany> UpdateAsync(RepresentedCompany representedCompany);
+    Task<RepresentedCompany> DeleteAsync(RepresentedCompany representedCompany);
 }
