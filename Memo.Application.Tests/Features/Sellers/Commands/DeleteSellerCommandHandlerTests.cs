@@ -31,7 +31,7 @@ public sealed class DeleteSellerCommandHandlerTests
         
         result.Should().Be(seller.Id);
         
-        await _repository.Received(1).DeleteAsync(seller);
+        _repository.Received(1).Delete(seller);
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
     
@@ -49,7 +49,7 @@ public sealed class DeleteSellerCommandHandlerTests
 
         await act.Should().ThrowAsync<EntityNotFoundException<Seller>>();
 
-        await _repository.DidNotReceive().DeleteAsync(Arg.Any<Seller>());
+        _repository.DidNotReceive().Delete(Arg.Any<Seller>());
         await _unitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

@@ -33,7 +33,7 @@ public sealed class UpdateSellerCommandHandlerTests
         seller.Password.Should().Be("StrongPassword2");
         result.Should().Be(seller.Id);
 
-        await _repository.Received(1).UpdateAsync(seller);
+        _repository.Received(1).Update(seller);
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
     
@@ -46,7 +46,7 @@ public sealed class UpdateSellerCommandHandlerTests
 
         await act.Should().ThrowAsync<EntityNotFoundException<Seller>>();
 
-        await _repository.DidNotReceive().UpdateAsync(Arg.Any<Seller>());
+        _repository.DidNotReceive().Update(Arg.Any<Seller>());
         await _unitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

@@ -22,11 +22,14 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.ConfigObject.AdditionalItems["operationsSorter"] = "method";
+        options.ConfigObject.AdditionalItems["tagsSorter"] = "alpha";
+    });
 }
 
 app.UseExceptionHandler();
