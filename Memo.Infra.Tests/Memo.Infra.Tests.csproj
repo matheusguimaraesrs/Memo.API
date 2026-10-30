@@ -31,8 +31,4 @@
       <ProjectReference Include="..\Memo.Infra\Memo.Infra.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Repositories\" />
-    </ItemGroup>
-
 </Project>

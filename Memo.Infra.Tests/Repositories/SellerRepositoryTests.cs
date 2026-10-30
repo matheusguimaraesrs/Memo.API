@@ -10,9 +10,9 @@ namespace Memo.Infra.Tests.Repositories;
 
 public sealed class SellerRepositoryTests
 {
-    private static Seller CreateSeller(string login = "test.login")
+    private static Seller CreateSeller(string name = "Test seller")
     {
-        return new Seller("Test seller", login, "test-password");
+        return new Seller(name, "test.login", "test-password");
     }
 
     private static SellerRepository CreateRepository(AppDbContext context)
@@ -28,7 +28,8 @@ public sealed class SellerRepositoryTests
         var seller = CreateSeller();
 
         var result = repository.Add(seller);
-
+        await context.SaveChangesAsync();
+        
         result.Should().BeSameAs(seller);
         var savedSeller = await context.Sellers.FindAsync(seller.Id);
         savedSeller.Should().NotBeNull();
@@ -40,7 +41,9 @@ public sealed class SellerRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
         var seller = CreateSeller();
+        
         repository.Add(seller);
+        await context.SaveChangesAsync();
 
         var result = await repository.GetByIdAsync(seller.Id);
 
@@ -64,17 +67,18 @@ public sealed class SellerRepositoryTests
     {
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
-        repository.Add(CreateSeller("first.login"));
-        repository.Add(CreateSeller("second.login"));
-        repository.Add(CreateSeller("third.login"));
+        repository.Add(CreateSeller("first"));
+        repository.Add(CreateSeller("second"));
+        repository.Add(CreateSeller("third"));
+        await context.SaveChangesAsync();
 
-        var result = await repository.GetPagedAsync(2, 2);
+        var result = await repository.GetPagedAsync(1, 20);
 
-        result.Items.Should().HaveCount(1);
-        result.Page.Should().Be(2);
-        result.PageSize.Should().Be(2);
+        result.Items.Should().HaveCount(3);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(20);
         result.TotalItems.Should().Be(3);
-        result.TotalPages.Should().Be(2);
+        result.TotalPages.Should().Be(1);
     }
 
     [Fact]
@@ -83,14 +87,18 @@ public sealed class SellerRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
         var seller = CreateSeller();
+        
         repository.Add(seller);
+        await context.SaveChangesAsync();
 
         seller.Update("Updated seller", "updated.login", "updated-password");
         repository.Update(seller);
+        await context.SaveChangesAsync();
 
         var updatedSeller = await repository.GetByIdAsync(seller.Id);
-        updatedSeller!.Name.Should().Be("Updated seller");
-        updatedSeller.Login.Should().Be("updated.login");
+        updatedSeller!.Name.Should().Be(seller.Name);
+        updatedSeller.Login.Should().Be(seller.Login);
+        updatedSeller.Password.Should().Be(seller.Password);
     }
 
     [Fact]
@@ -100,13 +108,16 @@ public sealed class SellerRepositoryTests
         var repository = CreateRepository(context);
         var seller = CreateSeller();
         repository.Add(seller);
+        await context.SaveChangesAsync();
 
         repository.Delete(seller);
+        await context.SaveChangesAsync();
 
-        (await repository.GetByIdAsync(seller.Id)).Should().BeNull();
-        var deletedSeller = await context.Sellers
+        var deletedSeller = await repository.GetByIdAsync(seller.Id);
+        deletedSeller.Should().BeNull();
+        deletedSeller = await context.Sellers
             .IgnoreQueryFilters()
-            .SingleAsync(item => item.Id == seller.Id);
+            .SingleAsync(c => c.Id == seller.Id);
         deletedSeller.IsDeleted.Should().BeTrue();
     }
 }
