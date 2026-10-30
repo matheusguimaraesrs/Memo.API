@@ -11,8 +11,7 @@ internal static class DbContextFactory
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new AppDbContext(
-            options, userContext ?? new FakeUserContext());
+        return new AppDbContext(options, userContext ?? new FakeUserContext());
     }
     
     private sealed class FakeUserContext : IUserContext
