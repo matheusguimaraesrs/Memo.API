@@ -5,7 +5,7 @@ using Memo.Domain.IRepositories;
 
 namespace Memo.Application.Features.Companies.Commands.Create;
 
-public class CreateCompanyCommandHandler(
+internal sealed class CreateCompanyCommandHandler(
     ICompanyRepository repository,
     IUnitOfWork unitOfWork) 
     : IRequestHandler<CreateCompanyCommand, Guid>
