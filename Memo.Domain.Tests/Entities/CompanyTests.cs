@@ -20,7 +20,7 @@ public sealed class CompanyTests
 
         company.Should().NotBeNull();
         company.Id.Should().NotBeEmpty();
-        company.CompanyName.Should().Be("test name");
+        company.Name.Should().Be("test name");
         company.Commission.Should().Be(80);
         
         //Audit tests
@@ -46,7 +46,7 @@ public sealed class CompanyTests
         Company company = CreateCompany();
         company.Update("New Name", 70);
 
-        company.CompanyName.Should().Be("New Name");
+        company.Name.Should().Be("New Name");
         company.Commission.Should().Be(70);
     }
 

@@ -96,7 +96,7 @@ public sealed class CompanyRepositoryTests
         await context.SaveChangesAsync();
 
         var updatedCompany = await repository.GetByIdAsync(company.Id);
-        updatedCompany!.CompanyName.Should().Be(company.CompanyName);
+        updatedCompany!.Name.Should().Be(company.Name);
         updatedCompany.Commission.Should().Be(company.Commission);
     }
     

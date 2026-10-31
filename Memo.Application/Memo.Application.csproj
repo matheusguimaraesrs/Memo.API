@@ -22,4 +22,10 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\Companies\Commands\Update\" />
+      <Folder Include="Features\Companies\Queries\GetAll\" />
+      <Folder Include="Features\Companies\Queries\GetById\" />
+    </ItemGroup>
+
 </Project>
