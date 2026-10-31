@@ -21,7 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IPaginationService, PaginationService>();
 
         services.AddScoped<ISellerRepository, SellerRepository>();
-        services.AddScoped<IRepresentedCompanyRepository, RepresentedCompanyRepository>();
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
         
         return services;
     }

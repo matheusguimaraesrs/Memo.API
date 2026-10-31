@@ -8,20 +8,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Tests.Repositories;
 
-public sealed class RepresentedCompanyRepositoryTests
+public sealed class CompanyRepositoryTests
 {
-    private static RepresentedCompany CreateCompany(string name = "test company")
+    private static Company CreateCompany(string name = "test company")
     {
-        return new RepresentedCompany(name, 80);
+        return new Company(name, 80);
     }
 
-    private static RepresentedCompanyRepository CreateRepository(AppDbContext context)
+    private static CompanyRepository CreateRepository(AppDbContext context)
     {
-        return new RepresentedCompanyRepository(context, new PaginationService());
+        return new CompanyRepository(context, new PaginationService());
     }
 
     [Fact]
-    public async Task Should_Create_RepresentedCompany()
+    public async Task Should_Create_Company()
     {
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
@@ -31,7 +31,7 @@ public sealed class RepresentedCompanyRepositoryTests
         await context.SaveChangesAsync();
 
         result.Should().BeSameAs(company);
-        var savedCompany = await context.RepresentedCompanies.FindAsync(company.Id);
+        var savedCompany = await context.Companies.FindAsync(company.Id);
         savedCompany.Should().NotBeNull();
     }
 
@@ -63,7 +63,7 @@ public sealed class RepresentedCompanyRepositoryTests
     }
 
     [Fact]
-    public async Task Should_Return_Paged_RepresentedCompanies()
+    public async Task Should_Return_Paged_Companies()
     {
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
@@ -82,7 +82,7 @@ public sealed class RepresentedCompanyRepositoryTests
     }
 
     [Fact]
-    public async Task Should_Update_RepresentedCompany()
+    public async Task Should_Update_Company()
     {
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
@@ -114,7 +114,7 @@ public sealed class RepresentedCompanyRepositoryTests
 
         var deletedCompany = await repository.GetByIdAsync(company.Id);
         deletedCompany.Should().BeNull();
-        deletedCompany = await context.RepresentedCompanies
+        deletedCompany = await context.Companies
              .IgnoreQueryFilters()
              .SingleAsync(c => c.Id == company.Id);
          deletedCompany.IsDeleted.Should().BeTrue();
