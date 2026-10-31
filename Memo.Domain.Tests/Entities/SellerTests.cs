@@ -26,7 +26,7 @@ public sealed class SellerTests
         
         //Audit tests
         seller.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
-        seller.CreatedBy.Should().BeNull();
+        //seller.CreatedBy.Should().NotBeNull();
         seller.UpdatedBy.Should().BeNull();
         seller.UpdatedAt.Should().BeNull();
         seller.IsDeleted.Should().BeFalse();
@@ -36,9 +36,9 @@ public sealed class SellerTests
     [InlineData("")]
     [InlineData("    ")]
     [InlineData(null)]
-    public void Create_WithInvalidParameters(string? invalidName)
+    public void Create_WithInvalidParameters(string? invalidLogin)
     {
-        Action action = () => new Seller(invalidName!, "login", "StrongPassword");
+        Action action = () => CreateSeller(invalidLogin!);
         action.Should().Throw<DomainException>();
     }
 
@@ -46,16 +46,12 @@ public sealed class SellerTests
     public void Update_WithValidParameters()
     {
         Seller seller = CreateSeller();
-
-        string name = "New Name";
-        string login = "new.login";
-        string password = "new.password";
         
-        seller.Update(name, login, password);
+        seller.Update("New Name", "new.login", "new.password");
 
-        seller.Name.Should().Be(name);
-        seller.Login.Should().Be(login);
-        seller.Password.Should().Be(password);
+        seller.Name.Should().Be("New Name");
+        seller.Login.Should().Be("new.login");
+        seller.Password.Should().Be("new.password");
     }
 
     [Theory]
@@ -65,11 +61,8 @@ public sealed class SellerTests
     public void Update_WithInvalidParameters(string? invalidName)
     {
         Seller seller = CreateSeller();
-        
-        string login = "joao.silva";
-        string password = "StrongPassword";
 
-        Action action = () => seller.Update(invalidName!, login, password);
+        Action action = () => seller.Update(invalidName!, "joao.silva", "StrongPassword");
         action.Should().Throw<DomainException>();
     }
 

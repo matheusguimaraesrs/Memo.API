@@ -3,14 +3,14 @@ using Memo.Domain.Exceptions;
 
 namespace Memo.Domain.Entities;
 
-public sealed class RepresentedCompany : AuditableEntity
+public sealed class Company : AuditableEntity
 {
     public string CompanyName { get; private set; }
     public decimal Commission { get; private set; }
 
-    private RepresentedCompany() { }
+    private Company() { }
 
-    public RepresentedCompany(string companyName, decimal commission)
+    public Company(string companyName, decimal commission)
     {
         Validations(companyName, commission);
 

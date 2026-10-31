@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Memo.Infra.Persistence.Configuration;
 
-internal sealed class RepresentedCompanyConfiguration : IEntityTypeConfiguration<RepresentedCompany>
+internal sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
 {
-    public void Configure(EntityTypeBuilder<RepresentedCompany> builder)
+    public void Configure(EntityTypeBuilder<Company> builder)
     {
-        builder.ToTable("RepresentedCompanies");
+        builder.ToTable("Companies");
         builder.HasKey(company => company.Id);
         builder.Property(company => company.CompanyName).IsRequired().HasMaxLength(100);
         builder.HasIndex(company => company.CompanyName).IsUnique();

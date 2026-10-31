@@ -14,7 +14,7 @@ public sealed class AppDbContext : DbContext
     }
 
     public DbSet<Seller> Sellers => Set<Seller>();
-    public DbSet<RepresentedCompany> RepresentedCompanies => Set<RepresentedCompany>();
+    public DbSet<Company> Companies => Set<Company>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
