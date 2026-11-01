@@ -13,20 +13,19 @@ internal sealed class GetAllCompaniesQueryHandler(
 {
     public async Task<PagedList<CompanyResponse>> HandleAsync(GetAllCompaniesQuery request, CancellationToken ct = default)
     {
-        PagedList<Company> result = await repository.GetPagedAsync(
+        PagedList<Company> pagedList = await repository.GetPagedAsync(
             request.Page, 
             request.PageSize, 
             ct);
 
-        IReadOnlyList<CompanyResponse> companies = result.Items
-            .Select(company => new CompanyResponse(
-                company.Id, company.Name, company.Commission))
+        IReadOnlyList<CompanyResponse> companies = pagedList.Items
+            .Select(company => new CompanyResponse(company.Id, company.Name, company.Commission))
             .ToList();
 
         return new PagedList<CompanyResponse>(
             companies,
-            result.Page,
-            result.PageSize,
-            result.TotalItems);
+            pagedList.Page,
+            pagedList.PageSize,
+            pagedList.TotalItems);
     }
 }

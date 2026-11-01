@@ -9,6 +9,6 @@ internal sealed class GetAllCompaniesValidator : AbstractValidator<GetAllCompani
         RuleFor(query => query.Page)
             .GreaterThan(0).WithMessage("Page must be greater than zero.");
         RuleFor(query => query.PageSize)
-            .InclusiveBetween(1, 100).WithMessage("Page size must be between 10 and 100.");
+            .InclusiveBetween(10, 100).WithMessage("Page size must be between 10 and 100.");
     }
 }
