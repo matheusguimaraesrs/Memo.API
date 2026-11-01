@@ -11,20 +11,19 @@ internal sealed class GetAllSellersQueryHandler(ISellerRepository repository)
 {
     public async Task<PagedList<SellerResponse>> HandleAsync(GetAllSellersQuery request, CancellationToken ct = default)
     {
-        PagedList<Seller> result = await repository.GetPagedAsync(
+        PagedList<Seller> pagedList = await repository.GetPagedAsync(
             request.Page,
             request.PageSize,
             ct);
 
-        IReadOnlyList<SellerResponse> sellers = result.Items
-            .Select(seller => new SellerResponse(
-                seller.Id, seller.Name, seller.Login))
+        IReadOnlyList<SellerResponse> sellers = pagedList.Items
+            .Select(seller => new SellerResponse(seller.Id, seller.Name, seller.Login))
             .ToList();
 
         return new PagedList<SellerResponse>(
             sellers,
-            result.Page,
-            result.PageSize,
-            result.TotalItems);
+            pagedList.Page,
+            pagedList.PageSize,
+            pagedList.TotalItems);
     }
 }
