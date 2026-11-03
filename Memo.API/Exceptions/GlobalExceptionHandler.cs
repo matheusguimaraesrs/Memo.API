@@ -16,11 +16,11 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
     {
         var problemDetails = exception switch
         {
-            ValidationException validationException => CreateValidationProblem(validationException),
-            DomainException => Create(StatusCodes.Status422UnprocessableEntity, "Business Rule Violation", exception.Message),
-            DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } } =>
-                Create(StatusCodes.Status409Conflict, "Conflict", "A record with the same unique value already exists."),
-            _ when IsEntityNotFound(exception) => Create(StatusCodes.Status404NotFound, "Not Found", exception.Message),
+            ValidationException ex => CreateValidationProblem(ex),
+            DomainException ex => Create(422, "Business Rule Violation", ex.Message),
+            _ when IsUniqueViolation(exception) => Create(409, "Conflict",
+                "A record with the same unique value already exists."),
+            _ when IsEntityNotFound(exception) => Create(404, "Not Found", exception.Message),
             _ => null
         };
 
@@ -43,6 +43,9 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
 
         return true;
     }
+    
+    static bool IsUniqueViolation(Exception ex) =>
+        ex is DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } };
 
     private static bool IsEntityNotFound(Exception exception) =>
         exception.GetType() is { IsGenericType: true } type &&
