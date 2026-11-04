@@ -18,8 +18,7 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
         {
             ValidationException ex => CreateValidationProblem(ex),
             DomainException ex => Create(422, "Business Rule Violation", ex.Message),
-            _ when IsUniqueViolation(exception) => Create(409, "Conflict",
-                "A record with the same unique value already exists."),
+            _ when IsUniqueViolation(exception) => Create(409, "Conflict", "This record already exists."),
             _ when IsEntityNotFound(exception) => Create(404, "Not Found", exception.Message),
             _ => null
         };

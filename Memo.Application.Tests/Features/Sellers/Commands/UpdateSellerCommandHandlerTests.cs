@@ -22,7 +22,7 @@ public sealed class UpdateSellerCommandHandlerTests
     [Fact]
     public async Task HandleAsync_ValidCommand()
     {
-        Seller? seller = new Seller("Old Name", "old.login", "StrongPassword");
+        Seller seller = new Seller("Old Name", "old.login", "StrongPassword");
         _repository.GetByIdAsync(seller.Id).Returns(seller);
 
         var command = new UpdateSellerCommand(seller.Id, "New Name", "new.login", "StrongPassword2");
@@ -43,7 +43,6 @@ public sealed class UpdateSellerCommandHandlerTests
         var command = new UpdateSellerCommand(Guid.NewGuid(), "", "", "");
 
         Func<Task> act = async () => await _handler.HandleAsync(command, CancellationToken.None);
-
         await act.Should().ThrowAsync<EntityNotFoundException<Seller>>();
 
         _repository.DidNotReceive().Update(Arg.Any<Seller>());

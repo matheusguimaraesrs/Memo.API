@@ -14,7 +14,7 @@ public sealed class SellersController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
     [EndpointSummary("Listar vendedores paginado")]
-    [EndpointDescription("Retorna a lista paginada de vendedores ativos.")]
+    [EndpointDescription("Retorna uma lista paginada de vendedores ativos.")]
     public async Task<IActionResult> GetAllPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await mediator.SendAsync(new GetAllSellersQuery(page, pageSize));

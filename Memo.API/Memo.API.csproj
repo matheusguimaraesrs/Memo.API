@@ -30,8 +30,4 @@
       <ProjectReference Include="..\Memo.Infra\Memo.Infra.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controllers\" />
-    </ItemGroup>
-
 </Project>

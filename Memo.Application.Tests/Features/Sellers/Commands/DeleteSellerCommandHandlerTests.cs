@@ -26,7 +26,6 @@ public sealed class DeleteSellerCommandHandlerTests
         _repository.GetByIdAsync(seller.Id).Returns(seller);
 
         var command = new DeleteSellerCommand(seller.Id);
-
         var result = await _handler.HandleAsync(command, CancellationToken.None);
         
         result.Should().Be(seller.Id);
@@ -40,13 +39,10 @@ public sealed class DeleteSellerCommandHandlerTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        _repository.GetByIdAsync(nonExistentId)
-            .Returns(Task.FromResult<Seller?>(null));
+        _repository.GetByIdAsync(nonExistentId).Returns(Task.FromResult<Seller?>(null));
 
         var command = new DeleteSellerCommand(nonExistentId);
-
         Func<Task> act = async () => await _handler.HandleAsync(command, CancellationToken.None);
-
         await act.Should().ThrowAsync<EntityNotFoundException<Seller>>();
 
         _repository.DidNotReceive().Delete(Arg.Any<Seller>());

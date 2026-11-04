@@ -29,8 +29,7 @@ public sealed class GetAllSellersQueryHandlerTests
         _repository.GetPagedAsync(1, 10, Arg.Any<CancellationToken>())
             .Returns(new PagedList<Seller>(sellers, 1, 10, 12));
         
-        var query = new GetAllSellersQuery(1, 10);
-
+        var query = new GetAllSellersQuery();
         var result = await _handler.HandleAsync(query, CancellationToken.None);
         
         result.Should().NotBeNull();

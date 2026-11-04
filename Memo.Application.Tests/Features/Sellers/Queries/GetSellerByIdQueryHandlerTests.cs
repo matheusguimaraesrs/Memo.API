@@ -28,7 +28,6 @@ public sealed class GetSellerByIdQueryHandlerTests
         _repository.GetByIdAsync(sellers[0].Id).Returns(sellers[0]);
 
         var query = new GetSellerByIdQuery(sellers[0].Id);
-
         var result = await _handler.HandleAsync(query, CancellationToken.None);
 
         result.Should().NotBeNull();
