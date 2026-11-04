@@ -6,9 +6,7 @@ using Memo.Domain.IRepositories;
 
 namespace Memo.Application.Features.Companies.Queries.GetAll;
 
-internal sealed class GetAllCompaniesQueryHandler(
-    ICompanyRepository repository, 
-    IUnitOfWork unitOfWork)
+internal sealed class GetAllCompaniesQueryHandler(ICompanyRepository repository)
     : IRequestHandler<GetAllCompaniesQuery, PagedList<CompanyResponse>>
 {
     public async Task<PagedList<CompanyResponse>> HandleAsync(GetAllCompaniesQuery request, CancellationToken ct = default)
