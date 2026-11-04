@@ -1,9 +1,9 @@
 using Memo.Application.Common.CQRS;
+using Memo.Application.Features.Companies.Commands.Create;
 using Memo.Application.Features.Companies.Commands.Delete;
 using Memo.Application.Features.Companies.Commands.Update;
 using Memo.Application.Features.Companies.Queries.GetAll;
 using Memo.Application.Features.Companies.Queries.GetById;
-using Memo.Application.Features.Sellers.Commands.Create;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Memo.API.Controllers;
@@ -33,7 +33,7 @@ public sealed class CompaniesController(IMediator mediator) : ControllerBase
     [HttpPost]
     [EndpointSummary("Criar empresa")]
     [EndpointDescription("Cria uma empresa nova e retorna o seu ID")]
-    public async Task<IActionResult> Create([FromBody] CreateSellerCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command)
     {
         Guid id = await mediator.SendAsync(command);
         return CreatedAtAction(nameof(GetById), new { id }, id);

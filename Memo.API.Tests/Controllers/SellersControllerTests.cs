@@ -40,7 +40,7 @@ public sealed class SellersControllerTests
         var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
         okResult.Value.Should().BeSameAs(response);
         await _mediator.Received(1).SendAsync(
-            new GetAllSellersQuery(1, 10),
+            new GetAllSellersQuery(),
             Arg.Any<CancellationToken>());
     }
 
