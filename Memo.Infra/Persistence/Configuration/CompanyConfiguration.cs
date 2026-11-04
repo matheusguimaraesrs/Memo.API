@@ -11,7 +11,7 @@ internal sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.ToTable("Companies");
         builder.HasKey(company => company.Id);
         builder.Property(company => company.Name).IsRequired().HasMaxLength(100);
-        builder.HasIndex(company => company.Name).IsUnique();
+        builder.HasIndex(company => company.Name).IsUnique().HasFilter("\"IsDeleted\" = false");
         builder.Property(company => company.Commission).IsRequired().HasPrecision(5, 2);
     }
 }
