@@ -35,6 +35,6 @@ public sealed class GetCompanyByIdQueryHandlerTests
         result.Name.Should().Be("Company One");
         result.Commission.Should().Be(80);
 
-        await _repository.Received(1).GetByIdAsync(companies[0].Id);
+        await _repository.Received(1).GetByIdAsync(companies[0].Id); 
     }
 }
