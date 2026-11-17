@@ -11,9 +11,9 @@ internal sealed class DeleteCompanyCommandHandler(
     IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteCompanyCommand, Guid>
 {
-    public async Task<Guid> HandleAsync(DeleteCompanyCommand request, CancellationToken ct = default)
+    public async Task<Guid> HandleAsync(DeleteCompanyCommand request, CancellationToken ct)
     {
-        Company? company = await repository.GetByIdAsync(request.Id);
+        Company? company = await repository.GetByIdAsync(request.Id, ct);
 
         if (company is null)
             throw new EntityNotFoundException<Company>();

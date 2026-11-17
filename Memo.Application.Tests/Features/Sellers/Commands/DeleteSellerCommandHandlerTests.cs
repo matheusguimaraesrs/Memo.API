@@ -23,7 +23,7 @@ public sealed class DeleteSellerCommandHandlerTests
     public async Task HandleAsync_WhenSellerExists()
     {
         Seller seller = new Seller("Test Name", "test.login", "StrongPassword");
-        _repository.GetByIdAsync(seller.Id).Returns(seller);
+        _repository.GetByIdAsync(seller.Id, Arg.Any<CancellationToken>()).Returns(seller);
 
         var command = new DeleteSellerCommand(seller.Id);
         var result = await _handler.HandleAsync(command, CancellationToken.None);
@@ -39,7 +39,8 @@ public sealed class DeleteSellerCommandHandlerTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        _repository.GetByIdAsync(nonExistentId).Returns(Task.FromResult<Seller?>(null));
+        _repository.GetByIdAsync(nonExistentId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Seller?>(null));
 
         var command = new DeleteSellerCommand(nonExistentId);
         Func<Task> act = async () => await _handler.HandleAsync(command, CancellationToken.None);

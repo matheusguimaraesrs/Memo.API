@@ -8,5 +8,5 @@ public interface IPaginationService
         IQueryable<T> query,
         int page,
         int pageSize,
-        CancellationToken ct = default);
+        CancellationToken ct);
 }

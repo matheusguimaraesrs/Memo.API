@@ -10,7 +10,7 @@ internal sealed class CreateCompanyCommandHandler(
     IUnitOfWork unitOfWork) 
     : IRequestHandler<CreateCompanyCommand, Guid>
 {
-    public async Task<Guid> HandleAsync(CreateCompanyCommand request, CancellationToken ct = default)
+    public async Task<Guid> HandleAsync(CreateCompanyCommand request, CancellationToken ct)
     {
         Company company = new Company(request.Name, request.Commission);
 

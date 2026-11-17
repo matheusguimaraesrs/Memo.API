@@ -8,7 +8,7 @@ public sealed class CustomMediator(IServiceProvider serviceProvider) : IMediator
 {
     private static readonly ConcurrentDictionary<(Type Request, Type Response), RequestExecutor> Executors = new();
 
-    public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct = default)
+    public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
 

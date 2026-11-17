@@ -23,7 +23,7 @@ public sealed class UpdateSellerCommandHandlerTests
     public async Task HandleAsync_ValidCommand()
     {
         Seller seller = new Seller("Old Name", "old.login", "StrongPassword");
-        _repository.GetByIdAsync(seller.Id).Returns(seller);
+        _repository.GetByIdAsync(seller.Id, Arg.Any<CancellationToken>()).Returns(seller);
 
         var command = new UpdateSellerCommand(seller.Id, "New Name", "new.login", "StrongPassword2");
         var result = await _handler.HandleAsync(command , CancellationToken.None);

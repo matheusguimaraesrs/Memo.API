@@ -25,7 +25,7 @@ public sealed class GetCompanyByIdQueryHandlerTests
             new Company("Company Two", 70)
         };
 
-        _repository.GetByIdAsync(companies[0].Id).Returns(companies[0]);
+        _repository.GetByIdAsync(companies[0].Id, Arg.Any<CancellationToken>()).Returns(companies[0]);
 
         var query = new GetCompanyByIdQuery(companies[0].Id);
         var result = await _handler.HandleAsync(query, CancellationToken.None);
@@ -35,6 +35,6 @@ public sealed class GetCompanyByIdQueryHandlerTests
         result.Name.Should().Be("Company One");
         result.Commission.Should().Be(80);
 
-        await _repository.Received(1).GetByIdAsync(companies[0].Id); 
+        await _repository.Received(1).GetByIdAsync(companies[0].Id, Arg.Any<CancellationToken>()); 
     }
 }
