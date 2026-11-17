@@ -117,10 +117,6 @@ Memo.API.sln
 ├── Memo.Application
 ├── Memo.Domain
 ├── Memo.Infra
-├── Memo.API.Tests
-├── Memo.Application.Tests
-├── Memo.Domain.Tests
-└── Memo.Infra.Tests
 ```
 
 ### Memo.Domain
