@@ -425,16 +425,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.ToTable("Products");
         builder.HasKey(product => product.Id);
-        builder.Property(product => product.Name)
-            .IsRequired()
-            .HasMaxLength(100);
-        builder.Property(product => product.Price)
-            .IsRequired()
-            .HasPrecision(12, 2);
-
-        builder.HasIndex(product => product.Name)
-            .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
+        builder.Property(product => product.Name).IsRequired().HasMaxLength(100);
+        builder.HasIndex(customer => customer.Name).IsUnique().HasFilter(""" "IsDeleted" = false""");
+        builder.Property(product => product.Price).IsRequired().HasPrecision(12, 2);
     }
 }
 ```
