@@ -11,7 +11,7 @@ internal sealed class SellerRepository(AppDbContext context, IPaginationService 
 {
     public async Task<PagedList<Seller>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
-        IQueryable<Seller> query = context.Set<Seller>()
+        IQueryable<Seller> query = context.Sellers
             .AsNoTracking()
             .OrderBy(seller => seller.CreatedAt)
             .ThenBy(seller => seller.Id);
@@ -21,7 +21,8 @@ internal sealed class SellerRepository(AppDbContext context, IPaginationService 
 
     public async Task<Seller?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        return await context.Set<Seller>().FirstOrDefaultAsync(s => s.Id == id, ct);
+        return await context.Sellers
+            .FirstOrDefaultAsync(seller => seller.Id == id, ct);
     }
  
     public Seller Add(Seller seller)
@@ -38,7 +39,7 @@ internal sealed class SellerRepository(AppDbContext context, IPaginationService 
 
     public Seller Delete(Seller seller)
     {
-        context.Set<Seller>().Remove(seller);
+        context.Sellers.Remove(seller);
         return seller;
     }
 }

@@ -460,32 +460,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Repositories;
 
-internal sealed class ProductRepository(
-    AppDbContext context,
-    IPaginationService pagination) : IProductRepository
+internal sealed class ProductRepository( AppDbContext context, IPaginationService pagination) : IProductRepository
 {
-    public async Task<PagedList<Product>> GetPagedAsync(
-        int page,
-        int pageSize,
-        CancellationToken ct)
+    public async Task<PagedList<Product>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
         IQueryable<Product> query = context.Products
             .AsNoTracking()
             .OrderBy(product => product.CreatedAt)
             .ThenBy(product => product.Id);
 
-        return await pagination.PaginateAsync(
-            query,
-            page,
-            pageSize,
-            ct);
+        return await pagination.PaginateAsync(query, page, pageSize, ct);
     }
 
-    public Task<Product?> GetByIdAsync(
-        Guid id,
-        CancellationToken ct)
+    public async Task<Product?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        return context.Products
+        return await context.Products
             .FirstOrDefaultAsync(product => product.Id == id, ct);
     }
 

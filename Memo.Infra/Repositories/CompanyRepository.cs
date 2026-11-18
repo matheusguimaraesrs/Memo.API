@@ -11,7 +11,7 @@ internal sealed class CompanyRepository(AppDbContext context, IPaginationService
 {
     public async Task<PagedList<Company>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
-        IQueryable<Company> query = context.Set<Company>()
+        IQueryable<Company> query = context.Companies
             .AsNoTracking()
             .OrderBy(company => company.CreatedAt)
             .ThenBy(company => company.Id);
@@ -21,7 +21,8 @@ internal sealed class CompanyRepository(AppDbContext context, IPaginationService
 
     public async Task<Company?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        return await context.Set<Company>().FirstOrDefaultAsync(c => c.Id == id, ct);
+        return await context.Companies
+            .FirstOrDefaultAsync(company => company.Id == id, ct);
     }
 
     public Company Add(Company company)
@@ -38,7 +39,7 @@ internal sealed class CompanyRepository(AppDbContext context, IPaginationService
 
     public Company Delete(Company company)
     {
-        context.Set<Company>().Remove(company);
+        context.Companies.Remove(company);
         return company;
     }
 }
