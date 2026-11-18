@@ -397,15 +397,8 @@ namespace Memo.Domain.IRepositories;
 
 public interface IProductRepository
 {
-    Task<PagedList<Product>> GetPagedAsync(
-        int page,
-        int pageSize,
-        CancellationToken ct);
-
-    Task<Product?> GetByIdAsync(
-        Guid id,
-        CancellationToken ct);
-
+    Task<PagedList<Product>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
+    Task<Product?> GetByIdAsync(Guid id, CancellationToken ct);
     Product Add(Product product);
     Product Update(Product product);
     Product Delete(Product product);
@@ -432,16 +425,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.ToTable("Products");
         builder.HasKey(product => product.Id);
-        builder.Property(product => product.Name)
-            .IsRequired()
-            .HasMaxLength(100);
-        builder.Property(product => product.Price)
-            .IsRequired()
-            .HasPrecision(12, 2);
-
-        builder.HasIndex(product => product.Name)
-            .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
+        builder.Property(product => product.Name).IsRequired().HasMaxLength(100);
+        builder.HasIndex(customer => customer.Name).IsUnique().HasFilter(""" "IsDeleted" = false""");
+        builder.Property(product => product.Price).IsRequired().HasPrecision(12, 2);
     }
 }
 ```
@@ -474,32 +460,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Repositories;
 
-internal sealed class ProductRepository(
-    AppDbContext context,
-    IPaginationService pagination) : IProductRepository
+internal sealed class ProductRepository( AppDbContext context, IPaginationService pagination) : IProductRepository
 {
-    public async Task<PagedList<Product>> GetPagedAsync(
-        int page,
-        int pageSize,
-        CancellationToken ct)
+    public async Task<PagedList<Product>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
         IQueryable<Product> query = context.Products
             .AsNoTracking()
             .OrderBy(product => product.CreatedAt)
             .ThenBy(product => product.Id);
 
-        return await pagination.PaginateAsync(
-            query,
-            page,
-            pageSize,
-            ct);
+        return await pagination.PaginateAsync(query, page, pageSize, ct);
     }
 
-    public Task<Product?> GetByIdAsync(
-        Guid id,
-        CancellationToken ct)
+    public async Task<Product?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        return context.Products
+        return await context.Products
             .FirstOrDefaultAsync(product => product.Id == id, ct);
     }
 
