@@ -61,7 +61,8 @@ namespace Memo.Infra.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Companies", (string)null);
                 });
@@ -111,7 +112,8 @@ namespace Memo.Infra.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Login")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Sellers", (string)null);
                 });

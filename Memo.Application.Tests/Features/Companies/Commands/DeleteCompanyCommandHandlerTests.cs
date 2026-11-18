@@ -23,7 +23,7 @@ public sealed class DeleteCompanyCommandHandlerTests
     public async Task HandleAsync_WhenCompanyExists()
     {
         Company company = new Company("test name", 80);
-        _repository.GetByIdAsync(company.Id).Returns(company);
+        _repository.GetByIdAsync(company.Id, Arg.Any<CancellationToken>()).Returns(company);
 
         var command = new DeleteCompanyCommand(company.Id);
         var result = await _handler.HandleAsync(command, CancellationToken.None);
@@ -39,7 +39,8 @@ public sealed class DeleteCompanyCommandHandlerTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        _repository.GetByIdAsync(nonExistentId).Returns(Task.FromResult<Company?>(null));
+        _repository.GetByIdAsync(nonExistentId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Company?>(null));
 
         var command = new DeleteCompanyCommand(nonExistentId);
         Func<Task> act = async () => await _handler.HandleAsync(command, CancellationToken.None);

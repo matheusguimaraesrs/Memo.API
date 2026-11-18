@@ -17,7 +17,7 @@ public sealed class AppDbContextTests
             password: "test-password");
 
         await context.Sellers.AddAsync(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         seller.CreatedBy.Should().Be("test-user");
         seller.CreatedAt.Should().NotBe(default);
@@ -31,13 +31,13 @@ public sealed class AppDbContextTests
         var seller = new Seller("Test seller", "test.login", "test-password");
 
         await context.Sellers.AddAsync(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         var createdAt = seller.CreatedAt;
         var createdBy = seller.CreatedBy;
 
         seller.Update("Updated seller", "updated.login", "updated-password");
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         seller.UpdatedBy.Should().Be("test-user");
         seller.UpdatedAt.Should().NotBeNull();
@@ -53,10 +53,10 @@ public sealed class AppDbContextTests
         var seller = new Seller("Test seller", "test.login", "test-password");
 
         await context.Sellers.AddAsync(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         context.Sellers.Remove(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         seller.IsDeleted.Should().BeTrue();
         seller.DeletedBy.Should().Be("test-user");
@@ -71,10 +71,10 @@ public sealed class AppDbContextTests
         var seller = new Seller("Test seller", "test.login", "test-password");
 
         await context.Sellers.AddAsync(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         context.Sellers.Remove(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         var result = await context.Sellers
             .FirstOrDefaultAsync(item => item.Id == seller.Id);
@@ -90,10 +90,10 @@ public sealed class AppDbContextTests
         var seller = new Seller("Test seller", "test.login", "test-password");
 
         await context.Sellers.AddAsync(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         context.Sellers.Remove(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         var result = await context.Sellers
             .IgnoreQueryFilters()

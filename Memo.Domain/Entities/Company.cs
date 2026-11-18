@@ -5,7 +5,7 @@ namespace Memo.Domain.Entities;
 
 public sealed class Company : AuditableEntity
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public decimal Commission { get; private set; }
 
     private Company() { }

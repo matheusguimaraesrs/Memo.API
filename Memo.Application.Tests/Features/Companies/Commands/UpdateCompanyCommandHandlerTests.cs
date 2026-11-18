@@ -23,7 +23,7 @@ public sealed class UpdateCompanyCommandHandlerTests
     public async Task HandleAsync_ValidCommand()
     {
         Company? company = new Company("Old Name", 80);
-        _repository.GetByIdAsync(company.Id).Returns(company);
+        _repository.GetByIdAsync(company.Id, Arg.Any<CancellationToken>()).Returns(company);
 
         var command = new UpdateCompanyCommand(company.Id, "New Name", 70);
         var result = await _handler.HandleAsync(command, CancellationToken.None);

@@ -28,7 +28,7 @@ public sealed class SellerRepositoryTests
         var seller = CreateSeller();
 
         var result = repository.Add(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
         
         result.Should().BeSameAs(seller);
         var savedSeller = await context.Sellers.FindAsync(seller.Id);
@@ -43,9 +43,9 @@ public sealed class SellerRepositoryTests
         var seller = CreateSeller();
         
         repository.Add(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var result = await repository.GetByIdAsync(seller.Id);
+        var result = await repository.GetByIdAsync(seller.Id,  CancellationToken.None);
 
         result.Should().NotBeNull();
         result!.Id.Should().Be(seller.Id);
@@ -57,7 +57,7 @@ public sealed class SellerRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
 
-        var result = await repository.GetByIdAsync(Guid.NewGuid());
+        var result = await repository.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
 
         result.Should().BeNull();
     }
@@ -70,9 +70,9 @@ public sealed class SellerRepositoryTests
         repository.Add(CreateSeller("first"));
         repository.Add(CreateSeller("second"));
         repository.Add(CreateSeller("third"));
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var result = await repository.GetPagedAsync(1, 20);
+        var result = await repository.GetPagedAsync(1, 20,CancellationToken.None);
 
         result.Items.Should().HaveCount(3);
         result.Page.Should().Be(1);
@@ -89,13 +89,13 @@ public sealed class SellerRepositoryTests
         var seller = CreateSeller();
         
         repository.Add(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         seller.Update("Updated seller", "updated.login", "updated-password");
         repository.Update(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var updatedSeller = await repository.GetByIdAsync(seller.Id);
+        var updatedSeller = await repository.GetByIdAsync(seller.Id, CancellationToken.None);
         updatedSeller!.Name.Should().Be(seller.Name);
         updatedSeller.Login.Should().Be(seller.Login);
         updatedSeller.Password.Should().Be(seller.Password);
@@ -108,12 +108,12 @@ public sealed class SellerRepositoryTests
         var repository = CreateRepository(context);
         var seller = CreateSeller();
         repository.Add(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         repository.Delete(seller);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var deletedSeller = await repository.GetByIdAsync(seller.Id);
+        var deletedSeller = await repository.GetByIdAsync(seller.Id,  CancellationToken.None);
         deletedSeller.Should().BeNull();
         deletedSeller = await context.Sellers
             .IgnoreQueryFilters()

@@ -5,9 +5,9 @@ namespace Memo.Domain.Entities;
 
 public sealed class Seller : AuditableEntity
 {
-    public string Name { get; private set; }
-    public string Login { get; private set; }
-    public string Password { get; private set; } 
+    public string Name { get; private set; } = null!;
+    public string Login { get; private set; } = null!;
+    public string Password { get; private set; } = null!;
     
     private Seller() { }
 
@@ -32,7 +32,7 @@ public sealed class Seller : AuditableEntity
     private static void Validations(string name, string login, string password)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Name cannot be null or empty.");
+            throw new DomainException("Seller name cannot be null or empty.");
         if (string.IsNullOrWhiteSpace(login))
             throw new DomainException("Login cannot be null or empty.");
         if (string.IsNullOrWhiteSpace(password))

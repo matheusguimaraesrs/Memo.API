@@ -25,7 +25,7 @@ public sealed class GetSellerByIdQueryHandlerTests
             new Seller("Seller Two", "seller.2", "123")
         };
 
-        _repository.GetByIdAsync(sellers[0].Id).Returns(sellers[0]);
+        _repository.GetByIdAsync(sellers[0].Id, Arg.Any<CancellationToken>()).Returns(sellers[0]);
 
         var query = new GetSellerByIdQuery(sellers[0].Id);
         var result = await _handler.HandleAsync(query, CancellationToken.None);
@@ -35,6 +35,6 @@ public sealed class GetSellerByIdQueryHandlerTests
         result.Name.Should().Be("Seller One");
         result.Login.Should().Be("seller.1");
 
-        await _repository.Received(1).GetByIdAsync(sellers[0].Id);
+        await _repository.Received(1).GetByIdAsync(sellers[0].Id, Arg.Any<CancellationToken>());
     }
 }

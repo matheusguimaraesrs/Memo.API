@@ -9,7 +9,7 @@ namespace Memo.Application.Features.Sellers.Queries.GetAll;
 internal sealed class GetAllSellersQueryHandler(ISellerRepository repository)
     : IRequestHandler<GetAllSellersQuery, PagedList<SellerResponse>>
 {
-    public async Task<PagedList<SellerResponse>> HandleAsync(GetAllSellersQuery request, CancellationToken ct = default)
+    public async Task<PagedList<SellerResponse>> HandleAsync(GetAllSellersQuery request, CancellationToken ct)
     {
         PagedList<Seller> pagedList = await repository.GetPagedAsync(
             request.Page,

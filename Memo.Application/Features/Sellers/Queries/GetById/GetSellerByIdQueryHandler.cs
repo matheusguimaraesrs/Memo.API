@@ -9,9 +9,9 @@ namespace Memo.Application.Features.Sellers.Queries.GetById;
 internal sealed class GetSellerByIdQueryHandler(ISellerRepository repository) 
     : IRequestHandler<GetSellerByIdQuery, SellerResponse>
 {
-    public async Task<SellerResponse> HandleAsync(GetSellerByIdQuery request, CancellationToken ct = default)
+    public async Task<SellerResponse> HandleAsync(GetSellerByIdQuery request, CancellationToken ct)
     {
-        Seller? seller = await repository.GetByIdAsync(request.Id);
+        Seller? seller = await repository.GetByIdAsync(request.Id, ct);
 
         if (seller is null)
             throw new EntityNotFoundException<Seller>();

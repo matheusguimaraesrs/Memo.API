@@ -12,7 +12,7 @@ internal sealed class SellerConfiguration : IEntityTypeConfiguration<Seller>
         builder.HasKey(seller => seller.Id);
         builder.Property(seller => seller.Name).IsRequired().HasMaxLength(100);
         builder.Property(seller => seller.Login).IsRequired().HasMaxLength(15);
-        builder.HasIndex(seller => seller.Login).IsUnique();
+        builder.HasIndex(seller => seller.Login).IsUnique().HasFilter("\"IsDeleted\" = false");
         builder.Property(seller => seller.Password).IsRequired().HasMaxLength(20);
     }
 }

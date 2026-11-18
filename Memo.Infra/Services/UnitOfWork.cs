@@ -5,7 +5,7 @@ namespace Memo.Infra.Services;
 
 internal sealed class UnitOfWork(AppDbContext context) : IUnitOfWork
 {
-    public Task<int> SaveChangesAsync(CancellationToken ct = default)
+    public Task<int> SaveChangesAsync(CancellationToken ct)
     {
         return context.SaveChangesAsync(ct);
     }

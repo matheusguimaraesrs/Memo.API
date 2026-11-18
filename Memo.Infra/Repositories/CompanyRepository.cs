@@ -9,7 +9,7 @@ namespace Memo.Infra.Repositories;
 
 internal sealed class CompanyRepository(AppDbContext context, IPaginationService pagination) : ICompanyRepository
 {
-    public async Task<PagedList<Company>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default)
+    public async Task<PagedList<Company>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
         IQueryable<Company> query = context.Set<Company>()
             .AsNoTracking()
@@ -19,9 +19,9 @@ internal sealed class CompanyRepository(AppDbContext context, IPaginationService
         return await pagination.PaginateAsync(query, page, pageSize, ct);
     }
 
-    public async Task<Company?> GetByIdAsync(Guid id)
+    public async Task<Company?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        return await context.Set<Company>().FirstOrDefaultAsync(c => c.Id == id);
+        return await context.Set<Company>().FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
     public Company Add(Company company)

@@ -9,9 +9,9 @@ namespace Memo.Application.Features.Companies.Queries.GetById;
 internal sealed class GetCompanyByIdQueryHandler(ICompanyRepository repository)
     : IRequestHandler<GetCompanyByIdQuery, CompanyResponse>
 {
-    public async Task<CompanyResponse> HandleAsync(GetCompanyByIdQuery request, CancellationToken ct = default)
+    public async Task<CompanyResponse> HandleAsync(GetCompanyByIdQuery request, CancellationToken ct)
     {
-        Company? company = await repository.GetByIdAsync(request.Id);
+        Company? company = await repository.GetByIdAsync(request.Id, ct);
 
         if (company is null)
             throw new EntityNotFoundException<Company>();

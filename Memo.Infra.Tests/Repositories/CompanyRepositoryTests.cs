@@ -28,7 +28,7 @@ public sealed class CompanyRepositoryTests
         var company = CreateCompany();
 
         var result = repository.Add(company);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         result.Should().BeSameAs(company);
         var savedCompany = await context.Companies.FindAsync(company.Id);
@@ -43,9 +43,9 @@ public sealed class CompanyRepositoryTests
         var company = CreateCompany();
 
         repository.Add(company);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var result = await repository.GetByIdAsync(company.Id);
+        var result = await repository.GetByIdAsync(company.Id,  CancellationToken.None);
 
         result.Should().NotBeNull();
         result!.Id.Should().Be(company.Id);
@@ -57,7 +57,7 @@ public sealed class CompanyRepositoryTests
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
 
-        var result = await repository.GetByIdAsync(Guid.NewGuid());
+        var result = await repository.GetByIdAsync(Guid.NewGuid(),  CancellationToken.None);
 
         result.Should().BeNull();
     }
@@ -70,9 +70,9 @@ public sealed class CompanyRepositoryTests
         repository.Add(CreateCompany("first"));
         repository.Add(CreateCompany("second"));
         repository.Add(CreateCompany("third"));
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var result = await repository.GetPagedAsync(1, 20);
+        var result = await repository.GetPagedAsync(1, 20, CancellationToken.None);
         
         result.Items.Should().HaveCount(3);
         result.Page.Should().Be(1);
@@ -89,13 +89,13 @@ public sealed class CompanyRepositoryTests
         var company = CreateCompany();
 
         repository.Add(company);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
         
         company.Update("Updated name", 70);
         repository.Update(company);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var updatedCompany = await repository.GetByIdAsync(company.Id);
+        var updatedCompany = await repository.GetByIdAsync(company.Id,  CancellationToken.None);
         updatedCompany!.Name.Should().Be(company.Name);
         updatedCompany.Commission.Should().Be(company.Commission);
     }
@@ -107,12 +107,12 @@ public sealed class CompanyRepositoryTests
         var repository = CreateRepository(context);
         var company = CreateCompany();
         repository.Add(company);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
         repository.Delete(company);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(CancellationToken.None);
 
-        var deletedCompany = await repository.GetByIdAsync(company.Id);
+        var deletedCompany = await repository.GetByIdAsync(company.Id,  CancellationToken.None);
         deletedCompany.Should().BeNull();
         deletedCompany = await context.Companies
              .IgnoreQueryFilters()

@@ -9,7 +9,7 @@ namespace Memo.Infra.Repositories;
 
 internal sealed class SellerRepository(AppDbContext context, IPaginationService pagination) : ISellerRepository
 {
-    public async Task<PagedList<Seller>> GetPagedAsync(int page, int pageSize, CancellationToken ct = default)
+    public async Task<PagedList<Seller>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
         IQueryable<Seller> query = context.Set<Seller>()
             .AsNoTracking()
@@ -19,9 +19,9 @@ internal sealed class SellerRepository(AppDbContext context, IPaginationService 
         return await pagination.PaginateAsync(query, page, pageSize, ct);
     }
 
-    public async Task<Seller?> GetByIdAsync(Guid id)
+    public async Task<Seller?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        return await context.Set<Seller>().FirstOrDefaultAsync(c => c.Id == id);
+        return await context.Set<Seller>().FirstOrDefaultAsync(s => s.Id == id, ct);
     }
  
     public Seller Add(Seller seller)
