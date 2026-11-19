@@ -7,6 +7,6 @@ internal sealed class DeleteSellerValidator : AbstractValidator<DeleteSellerComm
     public DeleteSellerValidator()
     {
         RuleFor(seller => seller.Id)
-            .NotEmpty().WithMessage("Id is required");
+            .NotEmpty().WithMessage("Id is required.");
     }
 }

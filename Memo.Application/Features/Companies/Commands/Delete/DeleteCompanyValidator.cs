@@ -7,6 +7,6 @@ internal sealed class DeleteCompanyValidator : AbstractValidator<DeleteCompanyCo
     public DeleteCompanyValidator()
     {
         RuleFor(company => company.Id)
-            .NotEmpty().WithMessage("Id is required");
+            .NotEmpty().WithMessage("Id is required.");
     }
 }
