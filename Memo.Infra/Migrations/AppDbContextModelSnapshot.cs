@@ -62,9 +62,55 @@ namespace Memo.Infra.Migrations
 
                     b.HasIndex("Name")
                         .IsUnique()
-                        .HasFilter("\"IsDeleted\" = false");
+                        .HasFilter(" \"IsDeleted\" = false");
 
                     b.ToTable("Companies", (string)null);
+                });
+
+            modelBuilder.Entity("Memo.Domain.Entities.Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter(" \"IsDeleted\" = false");
+
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Memo.Domain.Entities.Seller", b =>
@@ -113,7 +159,7 @@ namespace Memo.Infra.Migrations
 
                     b.HasIndex("Login")
                         .IsUnique()
-                        .HasFilter("\"IsDeleted\" = false");
+                        .HasFilter(" \"IsDeleted\" = false");
 
                     b.ToTable("Sellers", (string)null);
                 });
