@@ -36,7 +36,9 @@ public sealed class SellersController(IMediator mediator) : ControllerBase
     [HttpPost]
     [EndpointSummary("Criar vendedor")]
     [EndpointDescription("Cria um vendedor novo e retorna o seu ID.")]
-    public async Task<IActionResult> Create([FromBody] CreateSellerCommand command, CancellationToken ct = default)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateSellerCommand command,
+        CancellationToken ct = default)
     {
         Guid id = await mediator.SendAsync(command, ct);
         return CreatedAtAction(nameof(GetById), new{ id }, id);

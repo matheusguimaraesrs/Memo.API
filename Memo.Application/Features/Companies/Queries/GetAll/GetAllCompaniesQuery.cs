@@ -4,4 +4,4 @@ using Memo.Domain.Common;
 
 namespace Memo.Application.Features.Companies.Queries.GetAll;
 
-public sealed record GetAllCompaniesQuery(int Page = 1, int PageSize = 10) : IRequest<PagedList<CompanyResponse>>;
+public sealed record GetAllCompaniesQuery(int Page, int PageSize) : IRequest<PagedList<CompanyResponse>>;

@@ -616,7 +616,7 @@ using Memo.Domain.Common;
 
 namespace Memo.Application.Features.Products.Queries.GetAll;
 
-public sealed record GetAllProductsQuery(int Page = 1, int PageSize = 10) : IRequest<PagedList<ProductResponse>>;
+public sealed record GetAllProductsQuery(int Page, int PageSize) : IRequest<PagedList<ProductResponse>>;
 ```
 
 O query handler consulta o repository e mapeia a entidade para o response:
@@ -682,17 +682,16 @@ operação:
 Exemplo:
 
 ```csharp
-internal sealed class CreateProductValidator
-    : AbstractValidator<CreateProductCommand>
+internal sealed class CreateProductValidator : AbstractValidator<CreateProductCommand>
 {
     public CreateProductValidator()
     {
         RuleFor(product => product.Name)
-            .NotEmpty()
-            .MaximumLength(100);
+            .NotEmpty().WithMessage("Name is required.")
+            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
 
         RuleFor(product => product.Price)
-            .GreaterThanOrEqualTo(0);
+            .GreaterThanOrEqualTo(0).WithMessage("Price must be greater than or equal to zero.");
     }
 }
 ```
@@ -735,20 +734,16 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
         [FromQuery] int pageSize = 10,
         CancellationToken ct = default)
     {
-        var result = await mediator.SendAsync(
-            new GetAllProductsQuery(page, pageSize), ct);
+        var result = await mediator.SendAsync(new GetAllProductsQuery(page, pageSize), ct);
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
     [EndpointSummary("Buscar produto por ID")]
     [EndpointDescription("Retorna os dados de um produto específico.")]
-    public async Task<IActionResult> GetById(
-        Guid id,
-        CancellationToken ct = default)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
-        var result = await mediator.SendAsync(
-            new GetProductByIdQuery(id), ct);
+        var result = await mediator.SendAsync(new GetProductByIdQuery(id), ct);
         return Ok(result);
     }
 
@@ -778,9 +773,7 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
     [HttpDelete("{id:guid}")]
     [EndpointSummary("Deletar produto")]
     [EndpointDescription("Exclui logicamente (soft-delete) um produto específico.")]
-    public async Task<IActionResult> Delete(
-        Guid id,
-        CancellationToken ct = default)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
     {
         await mediator.SendAsync(new DeleteProductCommand(id), ct);
         return NoContent();
