@@ -1,8 +1,7 @@
-using Memo.Application.Features.Customers.Response;
 using Memo.Domain.Entities;
 using Memo.Domain.ValueObjects;
 
-namespace Memo.Application.Features.Customers;
+namespace Memo.Application.Features.Customers.Response;
 
 internal static class CustomerResponseMapper
 {

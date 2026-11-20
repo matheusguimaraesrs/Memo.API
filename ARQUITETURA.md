@@ -97,6 +97,52 @@ por meio de entidades que encapsulam regras de negócio, protegem suas invariant
 controlam as alterações de estado. O projeto também utiliza abstrações de repositórios 
 para separar o domínio dos mecanismos de persistência.
 
+O domínio distingue **entidades** de **Value Objects**:
+
+- entidades possuem identidade própria, representada por `Id`, e continuam sendo
+  reconhecidas como a mesma entidade apesar de suas propriedades mudarem;
+- Value Objects são definidos exclusivamente pelos seus valores e não possuem
+  identidade própria;
+- duas instâncias de um Value Object são consideradas iguais quando todos os
+  seus valores são iguais;
+- um Value Object deve ser criado somente em estado válido e não expõe métodos
+  que alterem seus campos individualmente;
+- quando o valor precisa mudar, cria-se uma nova instância e a entidade substitui
+  o objeto anterior.
+
+Um Value Object deve encapsular validações que pertencem ao seu próprio conceito.
+Por exemplo, `Address` valida campos obrigatórios e estado inválido:
+
+```csharp
+public sealed record Address
+{
+    public string PostalCode { get; private set; } = null!;
+
+    private Address() { }
+
+    public Address(string postalCode)
+    {
+        Validate(postalCode);
+
+        PostalCode = postalCode;
+    }
+
+    private static void Validate(string postalCode)
+    {
+        if (string.IsNullOrWhiteSpace(postalCode))
+            throw new DomainException("Postal code cannot be null or empty.");
+    }
+}
+```
+
+O `record` fornece igualdade estrutural. Os setters privados impedem alterações
+públicas fora do próprio domínio, e o construtor validado é a única forma
+normal de criar um novo endereço.
+
+O construtor sem parâmetros existe por necessidade de materialização do EF
+Core. Ele não pode substituir o construtor público validado durante a criação
+pelos casos de uso da aplicação.
+
 O projeto utiliza:
 
 - **.NET 10** e ASP.NET Core;
@@ -138,9 +184,15 @@ Principais diretórios:
 Memo.Domain/
 ├── Common/
 ├── Entities/
+├── Enums/
 ├── Exceptions/
-└── IRepositories/
+├── IRepositories/
+└── ValueObjects/
 ```
+
+Value Objects ficam em `Memo.Domain/ValueObjects`. Eles não recebem `Id`,
+não possuem repositories e não são entidades auditáveis. São usados como
+partes integrantes de uma entidade.
 
 Uma entidade persistida segue o padrão de `AuditableEntity`. Isso fornece:
 
@@ -148,10 +200,39 @@ Uma entidade persistida segue o padrão de `AuditableEntity`. Isso fornece:
 - `CreatedAt` e `CreatedBy`;
 - `UpdatedAt` e `UpdatedBy`;
 - `IsDeleted`;
-- `DeletedAt` e `DeletedBy`.
 
 As propriedades têm setters protegidos, e as alterações devem ser feitas por
 métodos da própria entidade, como `Update`.
+
+Exemplo:
+
+```csharp
+public sealed class Customer : AuditableEntity
+{
+    public string Name { get; private set; } = null!;
+    public Address Address { get; private set; } = null!;
+
+    private Customer() { }
+
+    public Customer(string name, Address address)
+    {
+        Validate(name, address);
+        Name = name;
+        Address = address;
+    }
+
+    public void Update(string name, Address address)
+    {
+        Validate(name, address);
+        Name = name;
+        Address = address;
+    }
+}
+```
+
+Para atualizar o endereço, o handler cria uma nova instância de `Address` e
+substitui o Value Object inteiro no `Customer`. Os campos do endereço não
+devem ser alterados por métodos públicos individuais.
 
 ### Memo.Application
 
@@ -435,6 +516,56 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 Como o `AppDbContext` usa `ApplyConfigurationsFromAssembly`, a configuração
 será descoberta automaticamente.
 
+Quando uma propriedade não escalar é um Value Object, ela precisa ser
+configurada antes das propriedades internas serem mapeadas. Para o exemplo
+`Customer.Address`, por exemplo:
+
+```csharp
+builder.OwnsOne(customer => customer.Address, address =>
+{
+    address.Property(value => value.PostalCode)
+        .HasColumnName("PostalCode")
+        .HasMaxLength(8)
+        .IsRequired();
+
+    address.Property(value => value.Number)
+        .HasColumnName("AddressNumber")
+        .HasMaxLength(20)
+        .IsRequired();
+
+    address.Property(value => value.Street)
+        .HasMaxLength(150)
+        .IsRequired();
+
+    address.Property(value => value.Neighborhood)
+        .HasMaxLength(100)
+        .IsRequired();
+
+    address.Property(value => value.City)
+        .HasMaxLength(100)
+        .IsRequired();
+
+    address.Property(value => value.State)
+        .HasConversion<string>()
+        .HasMaxLength(2)
+        .IsRequired();
+});
+```
+
+`OwnsOne` informa ao EF Core que `Address` pertence ao `Customer`. Ele não
+cria uma entidade de endereço, não cria um `Id` de endereço e não cria,
+necessariamente, uma tabela separada; os campos podem ser persistidos na
+tabela `Customers`.
+
+Esse mapeamento é necessário porque não se usa diretamente:
+
+```csharp
+builder.Property(customer => customer.Address.PostalCode);
+```
+
+Uma propriedade composta precisa ser identificada como owned type ou complex
+type antes de seus campos internos serem mapeados.
+
 ### 4. Registrar o DbSet
 
 Em `Memo.Infra/Persistence/AppDbContext.cs`, adicione:
@@ -550,9 +681,83 @@ namespace Memo.Application.Features.Products.Response;
 public sealed record ProductResponse(Guid Id, string Name, decimal Price);
 ```
 
+Quando o response incluir um Value Object, crie um response específico para
+representar seus dados:
+
+```csharp
+public sealed record AddressResponse(
+    string PostalCode,
+    string Number,
+    string Street,
+    string Neighborhood,
+    string City,
+    BrazilianState State);
+
+public sealed record CustomerResponse(
+    Guid Id,
+    string Name,
+    AddressResponse Address);
+```
+
+Os query handlers devem mapear explicitamente o Value Object para o response:
+
+```csharp
+AddressResponse address = new(
+    customer.Address.PostalCode,
+    customer.Address.Number,
+    customer.Address.Street,
+    customer.Address.Neighborhood,
+    customer.Address.City,
+    customer.Address.State);
+
+return new CustomerResponse(customer.Id, customer.Name, address);
+```
+
 Commands que apenas executam uma ação podem retornar `Guid`, `bool` ou outro
 tipo simples, conforme o contrato da operação. Não é necessário criar um
 response para toda operação.
+
+Quando uma entidade possui um Value Object usado em entrada ou saída, a
+Application deve separar:
+
+- o Value Object do domínio, como `Address`;
+- o DTO de entrada, como `AddressInput`;
+- o DTO de saída, como `AddressResponse`.
+
+O Value Object não deve ser usado diretamente como contrato HTTP. O command
+recebe o DTO de entrada:
+
+```csharp
+using Memo.Domain.Enums;
+
+namespace Memo.Application.Features.Customers.Commands;
+
+public sealed record AddressInput(
+    string PostalCode,
+    string Number,
+    string Street,
+    string Neighborhood,
+    string City,
+    BrazilianState State);
+```
+
+O handler converte o DTO em Value Object:
+
+```csharp
+Address address = new(
+    request.Address.PostalCode,
+    request.Address.Number,
+    request.Address.Street,
+    request.Address.Neighborhood,
+    request.Address.City,
+    request.Address.State);
+
+Customer customer = new(request.Name, address);
+```
+
+No update, o handler cria uma nova instância de `Address` e substitui o
+endereço inteiro no `Customer`. Isso preserva a imutabilidade do conceito e
+garante que todas as validações do construtor sejam executadas novamente.
 
 #### Command e CommandHandler
 
@@ -822,3 +1027,22 @@ dotnet ef database update \
 
 Nunca apague migrations já aplicadas para corrigir o modelo em um ambiente
 compartilhado. Crie uma nova migration incremental.
+
+Quando uma entidade passa a usar um Value Object, revise a migration gerada
+antes de aplicá-la. A coluna antiga não deve ser removida automaticamente
+se já houver dados que precisam ser convertidos.
+
+Para `Customer.Address`, por exemplo, a migration deve substituí-la pelas
+colunas dos campos do Value Object:
+
+```text
+PostalCode
+AddressNumber
+Street
+Neighborhood
+City
+State
+```
+
+Se o banco já contém registros com um endereço único em formato textual,
+defina uma estratégia de conversão antes de remover essa coluna.
