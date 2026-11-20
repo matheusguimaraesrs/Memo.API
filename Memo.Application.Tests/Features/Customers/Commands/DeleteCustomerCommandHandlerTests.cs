@@ -2,8 +2,10 @@ using FluentAssertions;
 using Memo.Application.Features.Customers.Commands.Delete;
 using Memo.Domain.Common;
 using Memo.Domain.Entities;
+using Memo.Domain.Enums;
 using Memo.Domain.Exceptions;
 using Memo.Domain.IRepositories;
+using Memo.Domain.ValueObjects;
 using NSubstitute;
 
 namespace Memo.Application.Tests.Features.Customers.Commands;
@@ -22,7 +24,9 @@ public sealed class DeleteCustomerCommandHandlerTests
     [Fact]
     public async Task HandleAsync_WhenCustomerExists()
     {
-        Customer customer = new("Test name", "Test address");
+        Address address = new(
+            "01001000", "100", "Main Street", "Downtown", "São Paulo", BrazilianState.SP);
+        Customer customer = new("Test name", address);
         _repository.GetByIdAsync(customer.Id, Arg.Any<CancellationToken>()).Returns(customer);
 
         var result = await _handler.HandleAsync(

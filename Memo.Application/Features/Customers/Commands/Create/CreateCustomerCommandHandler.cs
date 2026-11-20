@@ -2,6 +2,7 @@ using Memo.Application.Common.CQRS;
 using Memo.Domain.Common;
 using Memo.Domain.Entities;
 using Memo.Domain.IRepositories;
+using Memo.Domain.ValueObjects;
 
 namespace Memo.Application.Features.Customers.Commands.Create;
 
@@ -12,7 +13,8 @@ internal sealed class CreateCustomerCommandHandler(
 {
     public async Task<Guid> HandleAsync(CreateCustomerCommand request, CancellationToken ct)
     {
-        Customer customer = new Customer(request.Name, request.Address);
+        Address address = AddressMapper.ToDomain(request.Address);
+        Customer customer = new Customer(request.Name, address);
 
         repository.Add(customer);
         await unitOfWork.SaveChangesAsync(ct);

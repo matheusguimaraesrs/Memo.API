@@ -16,6 +16,6 @@ internal sealed class GetCustomerByIdQueryHandler(ICustomerRepository repository
         if (customer is null)
             throw new EntityNotFoundException<Customer>();
 
-        return new CustomerResponse(customer.Id, customer.Name, customer.Address);
+        return CustomerResponseMapper.ToResponse(customer);
     }
 }

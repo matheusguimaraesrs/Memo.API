@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Memo.API.Controllers;
 using Memo.Application.Common.CQRS;
+using Memo.Application.Features.Customers;
 using Memo.Application.Features.Customers.Commands.Create;
 using Memo.Application.Features.Customers.Commands.Delete;
 using Memo.Application.Features.Customers.Commands.Update;
@@ -11,6 +12,7 @@ using Memo.Application.Features.Customers.Queries.GetAll;
 using Memo.Application.Features.Customers.Queries.GetById;
 using Memo.Application.Features.Customers.Response;
 using Memo.Domain.Common;
+using Memo.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 
@@ -67,7 +69,9 @@ public sealed class CustomerControllerTests
     public async Task GetById_Should_Return_Ok()
     {
         var id = Guid.NewGuid();
-        var response = new CustomerResponse(id, "Test customer", "Test address");
+        var address = new AddressResponse(
+            "01001000", "100", "Main Street", "Downtown", "São Paulo", BrazilianState.SP);
+        var response = new CustomerResponse(id, "Test customer", address);
         _mediator.SendAsync(
                 Arg.Any<GetCustomerByIdQuery>(),
                 Arg.Any<CancellationToken>())
@@ -86,7 +90,9 @@ public sealed class CustomerControllerTests
     public async Task Create_Should_Return_CreatedAtAction()
     {
         var id = Guid.NewGuid();
-        var command = new CreateCustomerCommand("Test customer", "Test address");
+        var address = new AddressInput(
+            "01001000", "100", "Main Street", "Downtown", "São Paulo", BrazilianState.SP);
+        var command = new CreateCustomerCommand("Test customer", address);
         _mediator.SendAsync(command, Arg.Any<CancellationToken>()).Returns(id);
 
         var result = await _controller.Create(command);
@@ -105,7 +111,8 @@ public sealed class CustomerControllerTests
         var command = new UpdateCustomerCommand(
             Guid.NewGuid(),
             "Updated customer",
-            "Updated address");
+            new AddressInput(
+                "80010000", "200", "New Street", "Centro", "Curitiba", BrazilianState.PR));
 
         var result = await _controller.Update(id, command);
 
