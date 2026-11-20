@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Memo.API.Exceptions;
 using Memo.Application;
 using Memo.Application.Common.CQRS;
@@ -19,6 +20,12 @@ builder.Services.AddApplication();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// ENUM TO STRING
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 var app = builder.Build();
 
