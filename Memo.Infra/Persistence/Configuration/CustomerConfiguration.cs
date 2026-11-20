@@ -12,6 +12,6 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasKey(customer => customer.Id);
         builder.Property(customer => customer.Name).IsRequired().HasMaxLength(100);
         builder.HasIndex(customer => customer.Name).IsUnique().HasFilter(""" "IsDeleted" = false""");
-        builder.Property(customer => customer.Address).IsRequired().HasMaxLength(100);
+        builder.Property(customer => customer.Address).IsRequired().HasMaxLength(255);
     }
 }
