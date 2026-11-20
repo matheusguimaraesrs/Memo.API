@@ -20,8 +20,7 @@ public sealed class CompaniesController(IMediator mediator) : ControllerBase
         [FromQuery] int pageSize = 10, 
         CancellationToken ct = default)
     {
-        var result = await mediator.SendAsync(
-            new GetAllCompaniesQuery(page, pageSize), ct);
+        var result = await mediator.SendAsync(new GetAllCompaniesQuery(page, pageSize), ct);
         return Ok(result);
     }
 
@@ -37,7 +36,9 @@ public sealed class CompaniesController(IMediator mediator) : ControllerBase
     [HttpPost]
     [EndpointSummary("Criar empresa")]
     [EndpointDescription("Cria uma empresa nova e retorna o seu ID")]
-    public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command, CancellationToken ct = default)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateCompanyCommand command,
+        CancellationToken ct = default)
     {
         Guid id = await mediator.SendAsync(command, ct);
         return CreatedAtAction(nameof(GetById), new { id }, id);

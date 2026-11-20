@@ -168,7 +168,7 @@ Features/
     │   ├── Create/
     │   ├── Update/
     │   └── Delete/
-    └── Queries/
+    ├── Queries/
         ├── GetAll/
         ├── GetById/
         └── Response/
@@ -426,7 +426,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.ToTable("Products");
         builder.HasKey(product => product.Id);
         builder.Property(product => product.Name).IsRequired().HasMaxLength(100);
-        builder.HasIndex(customer => customer.Name).IsUnique().HasFilter(""" "IsDeleted" = false""");
+        builder.HasIndex(product => product.Name).IsUnique().HasFilter(""" "IsDeleted" = false""");
         builder.Property(product => product.Price).IsRequired().HasPrecision(12, 2);
     }
 }
@@ -460,7 +460,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Memo.Infra.Repositories;
 
-internal sealed class ProductRepository( AppDbContext context, IPaginationService pagination) : IProductRepository
+internal sealed class ProductRepository(AppDbContext context, IPaginationService pagination) : IProductRepository
 {
     public async Task<PagedList<Product>> GetPagedAsync(int page, int pageSize, CancellationToken ct)
     {
@@ -509,7 +509,7 @@ services.AddScoped<IProductRepository, ProductRepository>();
 Sem esse registro, o mediator encontrará o handler, mas a injeção do
 repository falhará em runtime.
 
-### 7. Criar commands, queries e handlers
+### 7. Criar responses, commands, queries, validators e handlers
 
 Crie uma pasta `Memo.Application/Features/Products` com a mesma organização
 usada por `Companies`:
@@ -520,11 +520,146 @@ Products/
 │   ├── Create/
 │   ├── Update/
 │   └── Delete/
-└── Queries/
-    ├── GetAll/
-    ├── GetById/
-    └── Response/
+├── Queries/
+│   ├── GetAll/
+│   └── GetById/
+└── Response/
 ```
+
+O fluxo de desenvolvimento de cada operação é:
+
+```text
+Response (se precisar)
+    ↓
+Command ou Query
+    ↓
+Validator (se precisar)
+    ↓
+CommandHandler ou QueryHandler
+```
+
+#### Response
+
+Crie o response antes da query quando a operação retornar dados. Responses
+representam o contrato de saída da aplicação e evitam expor entidades do
+domínio diretamente pela API:
+
+```csharp
+namespace Memo.Application.Features.Products.Response;
+
+public sealed record ProductResponse(Guid Id, string Name, decimal Price);
+```
+
+Commands que apenas executam uma ação podem retornar `Guid`, `bool` ou outro
+tipo simples, conforme o contrato da operação. Não é necessário criar um
+response para toda operação.
+
+#### Command e CommandHandler
+
+Um command representa uma intenção que altera o estado. Por exemplo,
+`CreateProductCommand` recebe somente os dados necessários para criar o
+produto:
+
+```csharp
+using Memo.Application.Common.CQRS;
+
+namespace Memo.Application.Features.Products.Commands.Create;
+
+public sealed record CreateProductCommand(string Name, decimal Price) : IRequest<Guid>;
+```
+
+O handler recebe as dependências por injeção, cria a entidade, adiciona-a ao
+repository e confirma a transação pela unit of work:
+
+```csharp
+using Memo.Application.Common.CQRS;
+using Memo.Domain.Common;
+using Memo.Domain.Entities;
+using Memo.Domain.IRepositories;
+
+namespace Memo.Application.Features.Products.Commands.Create;
+
+internal sealed class CreateProductCommandHandler(
+    IProductRepository repository,
+    IUnitOfWork unitOfWork)
+    : IRequestHandler<CreateProductCommand, Guid>
+{
+    public async Task<Guid> HandleAsync(
+        CreateProductCommand request,
+        CancellationToken ct)
+    {
+        Product product = new(request.Name, request.Price);
+
+        repository.Add(product);
+        await unitOfWork.SaveChangesAsync(ct);
+
+        return product.Id;
+    }
+}
+```
+
+Para update, o handler deve buscar a entidade, lançar
+`EntityNotFoundException<Product>` quando ela não existir, chamar o método de
+domínio de atualização e salvar as alterações. Para delete, deve buscar a
+entidade e chamar `repository.Delete`; o `AppDbContext` transforma essa
+remoção em soft-delete.
+
+#### Query e QueryHandler
+
+Uma query apenas consulta dados e não chama `SaveChangesAsync`. Por exemplo,
+uma query paginada retorna `PagedList<ProductResponse>`:
+
+```csharp
+using Memo.Application.Common.CQRS;
+using Memo.Application.Features.Products.Response;
+using Memo.Domain.Common;
+
+namespace Memo.Application.Features.Products.Queries.GetAll;
+
+public sealed record GetAllProductsQuery(int Page, int PageSize) : IRequest<PagedList<ProductResponse>>;
+```
+
+O query handler consulta o repository e mapeia a entidade para o response:
+
+```csharp
+using Memo.Application.Common.CQRS;
+using Memo.Application.Features.Products.Response;
+using Memo.Domain.Common;
+using Memo.Domain.Entities;
+using Memo.Domain.IRepositories;
+
+namespace Memo.Application.Features.Products.Queries.GetAll;
+
+internal sealed class GetAllProductsQueryHandler(IProductRepository repository)
+    : IRequestHandler<GetAllProductsQuery, PagedList<ProductResponse>>
+{
+    public async Task<PagedList<ProductResponse>> HandleAsync(GetAllProductsQuery request, CancellationToken ct)
+    {
+        PagedList<Product> pagedList = await repository.GetPagedAsync(
+            request.Page,
+            request.PageSize,
+            ct);
+
+        IReadOnlyList<ProductResponse> products = pagedList.Items
+            .Select(product => new ProductResponse(
+                product.Id,
+                product.Name,
+                product.Price))
+            .ToList();
+
+        return new PagedList<ProductResponse>(
+            products,
+            pagedList.Page,
+            pagedList.PageSize,
+            pagedList.TotalItems);
+    }
+}
+```
+
+Para uma query por ID, crie `GetProductByIdQuery(Guid Id) :
+IRequest<ProductResponse>` e um `GetProductByIdQueryHandler`. O handler deve
+buscar pelo repository, lançar `EntityNotFoundException<Product>` se o
+resultado for nulo e mapear o produto para `ProductResponse`.
 
 Cada request deve implementar `IRequest<TResponse>`. Cada handler deve:
 
@@ -532,31 +667,31 @@ Cada request deve implementar `IRequest<TResponse>`. Cada handler deve:
 - receber `CancellationToken ct` sem valor padrão;
 - passar `ct` para todas as operações assíncronas;
 - lançar `EntityNotFoundException<Product>` quando necessário;
-- chamar `SaveChangesAsync(ct)` em comandos que alteram dados.
+- chamar `SaveChangesAsync(ct)` somente em comandos que alteram dados.
 
 Não é necessário registrar handlers manualmente. O `AddApplication` faz
 scan do assembly e registra automaticamente implementações de
 `IRequestHandler<,>`.
 
-### 8. Criar validators
+#### Validator
 
-Cada command e query que precisar de validação deve ter um validator interno
-derivado de `AbstractValidator<T>`.
+Crie um validator somente quando o command ou query tiver regras de entrada.
+Ele deve ser interno, derivar de `AbstractValidator<T>` e ficar junto da
+operação:
 
 Exemplo:
 
 ```csharp
-internal sealed class CreateProductValidator
-    : AbstractValidator<CreateProductCommand>
+internal sealed class CreateProductValidator : AbstractValidator<CreateProductCommand>
 {
     public CreateProductValidator()
     {
         RuleFor(product => product.Name)
-            .NotEmpty()
-            .MaximumLength(100);
+            .NotEmpty().WithMessage("Name is required.")
+            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
 
         RuleFor(product => product.Price)
-            .GreaterThanOrEqualTo(0);
+            .GreaterThanOrEqualTo(0).WithMessage("Price must be greater than or equal to zero.");
     }
 }
 ```
@@ -564,33 +699,108 @@ internal sealed class CreateProductValidator
 Os validators são descobertos automaticamente por
 `AddValidatorsFromAssembly(..., includeInternalTypes: true)`.
 
-### 9. Criar o response
-
-Não exponha diretamente a entidade do domínio pela API. Crie um response
-específico, por exemplo:
-
-```csharp
-public sealed record ProductResponse(
-    Guid Id,
-    string Name,
-    decimal Price);
-```
-
-O handler da query deve mapear `Product` para `ProductResponse`.
-
 ### 10. Criar o controller
 
 Crie `Memo.API/Controllers/ProductsController.cs`, seguindo o padrão de
 `CompaniesController`.
 
-O controller deve:
+O controller é apenas a camada HTTP: recebe parâmetros da rota/query/body,
+cria o command ou query, envia-o ao mediator e converte o resultado em
+resposta HTTP. Ele não deve conter regra de negócio nem acessar o repository
+diretamente.
+
+Implemente os endpoints CRUD da seguinte forma:
+
+```csharp
+using Memo.Application.Common.CQRS;
+using Memo.Application.Features.Products.Commands.Create;
+using Memo.Application.Features.Products.Commands.Delete;
+using Memo.Application.Features.Products.Commands.Update;
+using Memo.Application.Features.Products.Queries.GetAll;
+using Memo.Application.Features.Products.Queries.GetById;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Memo.API.Controllers;
+
+[ApiController]
+[Route("api/products")]
+public sealed class ProductsController(IMediator mediator) : ControllerBase
+{
+    [HttpGet]
+    [EndpointSummary("Listar produtos paginado")]
+    [EndpointDescription("Retorna uma lista paginada de produtos ativos.")]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        CancellationToken ct = default)
+    {
+        var result = await mediator.SendAsync(new GetAllProductsQuery(page, pageSize), ct);
+        return Ok(result);
+    }
+
+    [HttpGet("{id:guid}")]
+    [EndpointSummary("Buscar produto por ID")]
+    [EndpointDescription("Retorna os dados de um produto específico.")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
+    {
+        var result = await mediator.SendAsync(new GetProductByIdQuery(id), ct);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [EndpointSummary("Criar produto")]
+    [EndpointDescription("Cria um produto novo e retorna o seu ID.")]
+    public async Task<IActionResult> Create(
+        [FromBody] CreateProductCommand command,
+        CancellationToken ct = default)
+    {
+        Guid id = await mediator.SendAsync(command, ct);
+        return CreatedAtAction(nameof(GetById), new { id }, id);
+    }
+
+    [HttpPut("{id:guid}")]
+    [EndpointSummary("Alterar produto")]
+    [EndpointDescription("Edita os dados de um produto específico.")]
+    public async Task<IActionResult> Update(
+        Guid id,
+        [FromBody] UpdateProductCommand command,
+        CancellationToken ct = default)
+    {
+        await mediator.SendAsync(command with { Id = id }, ct);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [EndpointSummary("Deletar produto")]
+    [EndpointDescription("Exclui logicamente (soft-delete) um produto específico.")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
+    {
+        await mediator.SendAsync(new DeleteProductCommand(id), ct);
+        return NoContent();
+    }
+}
+```
+
+Ao criar um controller:
 
 - usar `[ApiController]`;
-- usar uma rota plural, como `api/products`;
+- usar uma rota plural e consistente, como `api/products`;
+- usar restrição `:guid` nas rotas de ID;
+- usar `[FromQuery]` para paginação e `[FromBody]` para commands;
 - receber `CancellationToken ct = default`;
 - passar `ct` para `mediator.SendAsync`;
-- retornar `Ok`, `CreatedAtAction`, `NoContent` e deixar exceções conhecidas
-  para o handler global.
+- retornar `Ok` para queries, `CreatedAtAction` para criação e `NoContent`
+  para update/delete;
+- deixar exceções conhecidas para o `GlobalExceptionHandler`;
+- sobrescrever o ID do body com o ID da rota no update:
+
+```csharp
+await mediator.SendAsync(command with { Id = id }, ct);
+```
+
+Não é necessário adicionar rotas manualmente no `Program.cs`: o
+`app.MapControllers()` descobre controllers decorados com os atributos do
+ASP.NET Core.
 
 ### 11. Criar e aplicar a migration
 
@@ -612,53 +822,3 @@ dotnet ef database update \
 
 Nunca apague migrations já aplicadas para corrigir o modelo em um ambiente
 compartilhado. Crie uma nova migration incremental.
-
-### 12. Criar os testes
-
-Adicione testes para cada camada:
-
-```text
-Memo.Domain.Tests/Entities/ProductTests.cs
-Memo.Application.Tests/Features/Products/...
-Memo.Infra.Tests/Repositories/ProductRepositoryTests.cs
-Memo.API.Tests/Controllers/ProductsControllerTests.cs
-```
-
-Cubra pelo menos:
-
-- criação válida e inválida;
-- atualização válida e inválida;
-- limites das regras de negócio;
-- entidade inexistente;
-- paginação;
-- soft-delete;
-- índice único, quando aplicável;
-- respostas HTTP do controller;
-- propagação do `CancellationToken`.
-
-Execute a suíte completa:
-
-```bash
-dotnet test Memo.API.sln --no-restore
-```
-
-## Checklist de uma nova entidade
-
-- [ ] Entidade criada em `Memo.Domain/Entities`;
-- [ ] Entidade herda de `AuditableEntity`, quando deve ter auditoria e soft-delete;
-- [ ] Regras de negócio protegidas na entidade;
-- [ ] Construtor do EF Core privado;
-- [ ] Contrato do repository criado;
-- [ ] Todos os métodos assíncronos exigem `CancellationToken`;
-- [ ] Configuração do EF Core criada;
-- [ ] `DbSet` adicionado ao `AppDbContext`;
-- [ ] Repository implementado;
-- [ ] Repository registrado no DI;
-- [ ] Commands e queries criados;
-- [ ] Handlers criados;
-- [ ] Validators criados;
-- [ ] Responses criados;
-- [ ] Controller criado;
-- [ ] Migration gerada e aplicada;
-- [ ] Testes de domínio, aplicação, infraestrutura e API criados;
-- [ ] `dotnet test Memo.API.sln --no-restore` executado com sucesso.
