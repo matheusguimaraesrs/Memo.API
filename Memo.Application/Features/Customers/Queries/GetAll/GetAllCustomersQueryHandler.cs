@@ -17,7 +17,7 @@ internal sealed class GetAllCustomersQueryHandler(ICustomerRepository repository
             ct);
 
         IReadOnlyList<CustomerResponse> customers = pagedList.Items
-            .Select(customer => new CustomerResponse(customer.Id, customer.Name, customer.Address))
+            .Select(CustomerResponseMapper.ToResponse)
             .ToList();
 
         return new PagedList<CustomerResponse>(

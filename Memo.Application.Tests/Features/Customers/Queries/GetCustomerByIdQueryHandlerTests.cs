@@ -1,8 +1,10 @@
 using FluentAssertions;
 using Memo.Application.Features.Customers.Queries.GetById;
 using Memo.Domain.Entities;
+using Memo.Domain.Enums;
 using Memo.Domain.Exceptions;
 using Memo.Domain.IRepositories;
+using Memo.Domain.ValueObjects;
 using NSubstitute;
 
 namespace Memo.Application.Tests.Features.Customers.Queries;
@@ -20,7 +22,9 @@ public sealed class GetCustomerByIdQueryHandlerTests
     [Fact]
     public async Task HandleAsync_WhenCustomerExists()
     {
-        Customer customer = new("Test customer", "Test address");
+        Address address = new(
+            "01001000", "100", "Main Street", "Downtown", "São Paulo", BrazilianState.SP);
+        Customer customer = new("Test customer", address);
         _repository.GetByIdAsync(customer.Id, Arg.Any<CancellationToken>()).Returns(customer);
 
         var result = await _handler.HandleAsync(
@@ -29,7 +33,9 @@ public sealed class GetCustomerByIdQueryHandlerTests
 
         result.Id.Should().Be(customer.Id);
         result.Name.Should().Be("Test customer");
-        result.Address.Should().Be("Test address");
+        result.Address.PostalCode.Should().Be("01001000");
+        result.Address.City.Should().Be("São Paulo");
+        result.Address.State.Should().Be(BrazilianState.SP);
         await _repository.Received(1).GetByIdAsync(
             customer.Id,
             Arg.Any<CancellationToken>());

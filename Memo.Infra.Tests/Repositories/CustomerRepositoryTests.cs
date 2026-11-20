@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Memo.Domain.Entities;
+using Memo.Domain.Enums;
+using Memo.Domain.ValueObjects;
 using Memo.Infra.Persistence;
 using Memo.Infra.Repositories;
 using Memo.Infra.Services;
@@ -12,9 +14,10 @@ public sealed class CustomerRepositoryTests
 {
     private static Customer CreateCustomer(
         string name = "Test customer",
-        string address = "Test address")
+        Address? address = null)
     {
-        return new Customer(name, address);
+        return new Customer(name, address ?? new Address(
+            "01001000", "100", "Main Street", "Downtown", "São Paulo", BrazilianState.SP));
     }
 
     private static CustomerRepository CreateRepository(AppDbContext context)
@@ -67,9 +70,9 @@ public sealed class CustomerRepositoryTests
     {
         await using var context = DbContextFactory.Create();
         var repository = CreateRepository(context);
-        repository.Add(CreateCustomer("first", "Address 1"));
-        repository.Add(CreateCustomer("second", "Address 2"));
-        repository.Add(CreateCustomer("third", "Address 3"));
+        repository.Add(CreateCustomer("first"));
+        repository.Add(CreateCustomer("second"));
+        repository.Add(CreateCustomer("third"));
         await context.SaveChangesAsync(CancellationToken.None);
 
         var result = await repository.GetPagedAsync(1, 20, CancellationToken.None);
@@ -90,13 +93,16 @@ public sealed class CustomerRepositoryTests
         repository.Add(customer);
         await context.SaveChangesAsync(CancellationToken.None);
 
-        customer.Update("Updated name", "Updated address");
+        Address updatedAddress = new(
+            "80010000", "200", "New Street", "Centro", "Curitiba", BrazilianState.PR);
+        customer.Update("Updated name", updatedAddress);
         repository.Update(customer);
         await context.SaveChangesAsync(CancellationToken.None);
 
         var updatedCustomer = await repository.GetByIdAsync(customer.Id, CancellationToken.None);
         updatedCustomer!.Name.Should().Be("Updated name");
-        updatedCustomer.Address.Should().Be("Updated address");
+        updatedCustomer.Address.PostalCode.Should().Be("80010000");
+        updatedCustomer.Address.City.Should().Be("Curitiba");
     }
 
     [Fact]

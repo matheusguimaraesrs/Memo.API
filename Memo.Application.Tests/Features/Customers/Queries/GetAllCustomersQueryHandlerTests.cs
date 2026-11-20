@@ -2,7 +2,9 @@ using FluentAssertions;
 using Memo.Application.Features.Customers.Queries.GetAll;
 using Memo.Domain.Common;
 using Memo.Domain.Entities;
+using Memo.Domain.Enums;
 using Memo.Domain.IRepositories;
+using Memo.Domain.ValueObjects;
 using NSubstitute;
 
 namespace Memo.Application.Tests.Features.Customers.Queries;
@@ -22,8 +24,10 @@ public sealed class GetAllCustomersQueryHandlerTests
     {
         List<Customer> customers =
         [
-            new("Customer One", "Address One"),
-            new("Customer Two", "Address Two")
+            new("Customer One", new Address(
+                "01001000", "100", "Street One", "Neighborhood One", "São Paulo", BrazilianState.SP)),
+            new("Customer Two", new Address(
+                "80010000", "200", "Street Two", "Neighborhood Two", "Curitiba", BrazilianState.PR))
         ];
         _repository.GetPagedAsync(1, 10, Arg.Any<CancellationToken>())
             .Returns(new PagedList<Customer>(customers, 1, 10, 12));
