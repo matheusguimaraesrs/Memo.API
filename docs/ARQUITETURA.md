@@ -1,5 +1,7 @@
 # Arquitetura do Memo.API
 
+**Documentação relacionada:** [CQRS](CQRS.md) | [IUnitOfWork](IUNITOFWORK.md)
+
 ## Visão geral
 
 O Memo.API utiliza **Clean Architecture**, organizadando em camadas e casos de uso, 
