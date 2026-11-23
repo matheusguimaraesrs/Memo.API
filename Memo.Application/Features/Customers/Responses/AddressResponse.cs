@@ -1,6 +1,6 @@
 using Memo.Domain.Enums;
 
-namespace Memo.Application.Features.Customers.Response;
+namespace Memo.Application.Features.Customers.Responses;
 
 public sealed record AddressResponse(
     string PostalCode,

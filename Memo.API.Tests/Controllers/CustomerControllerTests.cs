@@ -10,7 +10,7 @@ using Memo.Application.Features.Customers.Commands.Delete;
 using Memo.Application.Features.Customers.Commands.Update;
 using Memo.Application.Features.Customers.Queries.GetAll;
 using Memo.Application.Features.Customers.Queries.GetById;
-using Memo.Application.Features.Customers.Response;
+using Memo.Application.Features.Customers.Responses;
 using Memo.Domain.Common;
 using Memo.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;

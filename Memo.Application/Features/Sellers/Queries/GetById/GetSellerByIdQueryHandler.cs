@@ -1,5 +1,5 @@
 using Memo.Application.Common.CQRS;
-using Memo.Application.Features.Sellers.Queries.Response;
+using Memo.Application.Features.Sellers.Responses;
 using Memo.Domain.Entities;
 using Memo.Domain.Exceptions;
 using Memo.Domain.IRepositories;

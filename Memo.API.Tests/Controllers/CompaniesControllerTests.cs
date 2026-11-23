@@ -9,7 +9,7 @@ using Memo.Application.Features.Companies.Commands.Delete;
 using Memo.Application.Features.Companies.Commands.Update;
 using Memo.Application.Features.Companies.Queries.GetAll;
 using Memo.Application.Features.Companies.Queries.GetById;
-using Memo.Application.Features.Companies.Queries.Response;
+using Memo.Application.Features.Companies.Responses;
 using Memo.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
