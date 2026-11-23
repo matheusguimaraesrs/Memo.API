@@ -58,7 +58,7 @@ public sealed class ProductTests
     {
         Product product = CreateProduct(description: description!);
 
-        product.Description.Should().Be(description ?? string.Empty);
+        product.Description.Should().Be(description);
     }
 
     [Theory]
