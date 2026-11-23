@@ -1,5 +1,5 @@
 using Memo.Application.Common.CQRS;
-using Memo.Application.Features.Customers.Response;
+using Memo.Application.Features.Customers.Responses;
 using Memo.Domain.Common;
 
 namespace Memo.Application.Features.Customers.Queries.GetAll;

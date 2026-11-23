@@ -789,9 +789,7 @@ internal sealed class CreateProductCommandHandler(
     IUnitOfWork unitOfWork)
     : IRequestHandler<CreateProductCommand, Guid>
 {
-    public async Task<Guid> HandleAsync(
-        CreateProductCommand request,
-        CancellationToken ct)
+    public async Task<Guid> HandleAsync(CreateProductCommand request, CancellationToken ct)
     {
         Product product = new(request.Name, request.Price);
 

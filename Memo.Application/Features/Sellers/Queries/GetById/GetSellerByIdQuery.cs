@@ -1,5 +1,5 @@
 using Memo.Application.Common.CQRS;
-using Memo.Application.Features.Sellers.Queries.Response;
+using Memo.Application.Features.Sellers.Responses;
 
 namespace Memo.Application.Features.Sellers.Queries.GetById;
 

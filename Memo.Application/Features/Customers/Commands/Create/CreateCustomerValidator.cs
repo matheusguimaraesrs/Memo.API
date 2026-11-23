@@ -11,7 +11,7 @@ internal sealed class CreateCustomerValidator : AbstractValidator<CreateCustomer
             .MaximumLength(100).WithMessage("Name must be not exceed 100 characters.");
         
         RuleFor(customer => customer.Address)
-            .NotEmpty().WithMessage("Address is required.");
+            .NotNull().WithMessage("Address is required.");
         
         RuleFor(customer => customer.Address.PostalCode)
             .NotEmpty().WithMessage("Postal code is required.")
