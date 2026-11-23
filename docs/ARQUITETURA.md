@@ -435,9 +435,7 @@ public sealed class Product : AuditableEntity
     public string Name { get; private set; } = null!;
     public decimal Price { get; private set; }
 
-    private Product()
-    {
-    }
+    private Product() { }
 
     public Product(string name, decimal price)
     {
