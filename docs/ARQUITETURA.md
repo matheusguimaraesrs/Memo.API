@@ -1,6 +1,6 @@
 # Arquitetura do Memo.API
 
-**Documentação relacionada:** [CQRS](CQRS.md) | [IUnitOfWork](IUNITOFWORK.md)
+**Documentação relacionada:** [CQRS](CQRS.md) | [Paginação](PAGINACAO.md) | [GlobalExceptionHandler](GLOBALEXCEPTIONHANDLER.md) | [Value Objects](VALUEOBJECT.md) | [IUnitOfWork](IUNITOFWORK.md)
 
 ## Visão geral
 

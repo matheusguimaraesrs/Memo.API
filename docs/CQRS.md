@@ -1,6 +1,6 @@
 # CQRS no Memo.API
 
-**Documentação relacionada:** [IUnitOfWork](IUNITOFWORK.md) | [Arquitetura geral](ARQUITETURA.md)
+**Documentação relacionada:** [IUnitOfWork](IUNITOFWORK.md) | [Paginação](PAGINACAO.md) | [Arquitetura geral](ARQUITETURA.md)
 
 ## Entendendo a ideia
 
