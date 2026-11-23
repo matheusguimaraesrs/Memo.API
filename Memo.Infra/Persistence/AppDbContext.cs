@@ -16,6 +16,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<Seller> Sellers => Set<Seller>();
     public DbSet<Company> Companies => Set<Company>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Product> Products => Set<Product>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
