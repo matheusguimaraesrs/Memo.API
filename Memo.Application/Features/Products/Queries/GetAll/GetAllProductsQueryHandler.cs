@@ -18,6 +18,7 @@ internal sealed class GetAllProductsQueryHandler(IProductRepository repository)
 
         IReadOnlyList<ProductResponse> products = pagedList.Items
             .Select(product => new ProductResponse(
+                product.Id,
                 product.Name,
                 product.Description,
                 product.UnitPrice,

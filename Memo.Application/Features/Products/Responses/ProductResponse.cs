@@ -1,3 +1,3 @@
 namespace Memo.Application.Features.Products.Responses;
 
-public sealed record ProductResponse(string Name, string Description, decimal UnitPrice, Guid CompanyId);
+public sealed record ProductResponse(Guid Id, string Name, string Description, decimal UnitPrice, Guid CompanyId);

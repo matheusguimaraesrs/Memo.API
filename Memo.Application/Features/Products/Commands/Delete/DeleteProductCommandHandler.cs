@@ -12,7 +12,7 @@ internal sealed class DeleteProductCommandHandler(
 {
     public async Task<Guid> HandleAsync(DeleteProductCommand request, CancellationToken ct)
     {
-        Product? product = await repository.GetByIdAsync(request.id, ct);
+        Product? product = await repository.GetByIdAsync(request.Id, ct);
 
         if (product is null)
             throw new EntityNotFoundException<Product>();

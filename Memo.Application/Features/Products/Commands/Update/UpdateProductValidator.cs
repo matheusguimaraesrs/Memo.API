@@ -12,7 +12,7 @@ internal sealed class UpdateProductValidator : AbstractValidator<UpdateProductCo
             .NotEmpty().WithMessage("Name is required.")
             .MaximumLength(100).WithMessage("Name must be not exceed 100 characters.");
         RuleFor(product => product.Description)
-            .MaximumLength(255).WithMessage("Description must be not exceed 100 characters.");
+            .MaximumLength(255).WithMessage("Description must not exceed 255 characters.");
         RuleFor(product => product.UnitPrice)
             .NotEmpty().WithMessage("Price is required.")
             .GreaterThan(0).WithMessage("Price must be greater than zero.");

@@ -54,11 +54,11 @@ public sealed class ProductTests
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public void Create_WithInvalidDescription(string? description)
+    public void Create_WithOptionalDescription(string? description)
     {
-        Action action = () => CreateProduct(description: description!);
+        Product product = CreateProduct(description: description!);
 
-        action.Should().Throw<DomainException>();
+        product.Description.Should().Be(description ?? string.Empty);
     }
 
     [Theory]

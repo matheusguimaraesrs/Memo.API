@@ -6,7 +6,7 @@ internal sealed class DeleteProductValidator : AbstractValidator<DeleteProductCo
 {
     public DeleteProductValidator()
     {
-        RuleFor(product => product.id)
+        RuleFor(product => product.Id)
             .NotEmpty().WithMessage("Id is required.");
     }
 }

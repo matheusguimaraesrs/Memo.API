@@ -17,6 +17,7 @@ internal sealed class GetProductByIdQueryHandler(IProductRepository repository)
             throw new EntityNotFoundException<Product>();
 
         return new ProductResponse(
+            product.Id,
             product.Name, 
             product.Description, 
             product.UnitPrice, 
