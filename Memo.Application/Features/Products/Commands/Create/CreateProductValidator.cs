@@ -12,6 +12,7 @@ internal sealed class CreateProductValidator: AbstractValidator<CreateProductCom
         RuleFor(product => product.Description)
             .MaximumLength(255).WithMessage("Description must not exceed 255 characters.");
         RuleFor(product => product.UnitPrice)
+            .NotEmpty().WithMessage("Price is required.")
             .GreaterThan(0).WithMessage("Price must be greater than zero.");
         RuleFor(product => product.CompanyId)
             .NotEmpty().WithMessage("Company is required.");
