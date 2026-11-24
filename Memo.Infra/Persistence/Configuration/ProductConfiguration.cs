@@ -14,5 +14,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(product => product.Name).IsUnique().HasFilter(""" "IsDeleted" = false""");
         builder.Property(product => product.Description).HasMaxLength(255);
         builder.Property(product => product.UnitPrice).IsRequired().HasPrecision(12, 2);
+        builder.HasOne<Company>()
+            .WithMany()
+            .HasForeignKey(product => product.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
     }
 }
